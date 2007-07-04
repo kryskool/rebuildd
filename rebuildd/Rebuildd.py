@@ -178,6 +178,7 @@ class Rebuildd:
             if job != None:
                 if job.isAlive():
                     job.do_quit.set()
+                    job.join()
                 job.build_status = JOBSTATUS.CANCELED
                 self.jobs.remove(job)
                 self.log.info("Canceled job %s for %s_%s on %s/%s for %s" \
