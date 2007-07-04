@@ -100,5 +100,8 @@ class RebuilddConfig(ConfigParser.ConfigParser):
     def save(self):
         """Save configuration file"""
 
-        self.write(file(self.config_file, 'w'))
+        try:
+            self.write(file(self.config_file, 'w'))
+        except Excepction, error:
+            return False
         return True
