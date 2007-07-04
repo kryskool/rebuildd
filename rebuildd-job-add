@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+#
+# rebuildd-add-job - Add a job to rebuildd
+#
+# (c) 2007 - Julien Danjou <acid@debian.org>
+#
+#   This software is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; version 2 dated June, 1991.
+#
+#   This software is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this software; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+#
+
+from rebuildd.Rebuildd import Rebuildd
+from rebuildd.RebuilddConfig import RebuilddConfig
+import sqlobject, sys
+
+def connect_db():
+    sqlobject.sqlhub.processConnection = \
+        sqlobject.connectionForURI(RebuilddConfig().get('build', 'database_uri'))
+
+connect_db()
+
+if len(sys.argv) == 4:
+    Rebuildd().add_job(sys.argv[1], sys.argv[2], sys.argv[3])
+    sys.exit(0)
+if len(sys.argv) == 5:
+    Rebuildd().add_job(sys.argv[1], sys.argv[2], sys.argv[3], mailto=None, arch=sys.argv[4])
+    sys.exit(0)
+if len(sys.argv) == 6:
+    Rebuildd().add_job(sys.argv[1], sys.argv[2], sys.argv[3], mailto=sys.argv[5], arch=sys.argv[4])
+    sys.exit(0)
+
+print "E: usage: %s <name> <version> <dist> [arch] [mailto]" % sys.argv[0]
+sys.exit(1)
