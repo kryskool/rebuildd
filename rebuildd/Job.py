@@ -85,7 +85,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         # download package for our dist
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
-                    Dists().dists[self.dist].get_build_cmd(self.package)):
+                    Dists().dists[self.dist].get_build_cmd(self.package)
+                    Dists().dists[self.dist].get_post_build_cmd(self.package)):
             try:
                 proc = subprocess.Popen(cmd.split(), bufsize=0,
                                                      preexec_fn=self.preexec_child,
@@ -102,7 +103,14 @@ class Job(threading.Thread, sqlobject.SQLObject):
             if self.do_quit.isSet() or state != 0:
                 break
 
-        build_log.close()
+        # build is finished
+        with self.status_lock:
+            if state == 0:
+                self.build_status = JOBSTATUS.BUILD_OK
+            else:
+                if state != None:
+                    self.build_status = JOBSTATUS.BUILD_FAILED
+
 
         if self.do_quit.isSet():
             # Kill gently the process
@@ -122,19 +130,18 @@ class Job(threading.Thread, sqlobject.SQLObject):
             with self.status_lock:
                 if self.build_status == JOBSTATUS.BUILDING:
                     self.build_status = JOBSTATUS.WAIT
-            return
+            build_log.write("\nJob killed on request\n")
 
-        # build is finished
-        with self.status_lock:
-            if state == 0:
-                self.build_status = JOBSTATUS.BUILD_OK
-            else:
-                self.build_status = JOBSTATUS.BUILD_FAILED
+        build_log.close()
 
         self.send_build_log()
 
     def send_build_log(self):
         """When job is BUILT, send logs by mail"""
+
+        if self.build_status != JOBSTATUS.BUILD_OK and \
+           self.build_status != JOBSTATUS.BUILD_FAILED:
+            return False
 
         if not int(RebuilddConfig().get('log', 'mail')):
             with self.status_lock:
@@ -143,10 +150,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 if self.build_status == JOBSTATUS.BUILD_FAILED:
                     self.build_status = JOBSTATUS.FAILED
             return True
-
-        if self.build_status != JOBSTATUS.BUILD_OK and \
-           self.build_status != JOBSTATUS.BUILD_FAILED:
-            return False
 
         bstatus = "failed"
 

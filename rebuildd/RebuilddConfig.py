@@ -47,6 +47,7 @@ class RebuilddConfig(ConfigParser.ConfigParser):
         self.set('build', 'max_threads', '2')
         self.set('build', 'source_cmd', 'apt-get -qq -t %s source %s=%s')
         self.set('build', 'build_cmd', 'pbuilder build --basetgz /tmp/%s.tgz %s_%s.dsc')
+        self.set('build', 'post_build_cmd', '')
         self.set('build', 'dists', 'etch lenny sid')
         self.set('build', 'work_dir', '/tmp')
         self.set('build', 'database_uri', 'sqlite://%s/rebuildd.db' \

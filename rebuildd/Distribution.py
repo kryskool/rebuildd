@@ -39,3 +39,9 @@ class Distribution(object):
 
         return RebuilddConfig().get('build', 'build_cmd') \
                 % (self.name, package.name, package.version)
+
+    def get_post_build_cmd(self, package):
+        """Return command used after building source for this distribution"""
+
+        return RebuilddConfig().get('build', 'build_cmd') \
+                % (self.name, package.name, package.version)
