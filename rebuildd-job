@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+#
+# rebuildd-job - Manage jobs for rebuildd
+#
+# (c) 2007 - Julien Danjou <acid@debian.org>
+#
+#   This software is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; version 2 dated June, 1991.
+#
+#   This software is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this software; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+#
+
+from rebuildd.Rebuildd import Rebuildd
+from rebuildd.RebuilddConfig import RebuilddConfig
+from rebuildd.Package import Package
+from rebuildd.Jobstatus import JOBSTATUS
+from rebuildd.Job import Job
+import sys, os.path
+
+def usage():
+    print "%s -- Manage job for rebuildd" % os.path.basename(sys.argv[0])
+    print "Usage: %s [command] <opts>\n" % os.path.basename(sys.argv[0])
+    print "Commands:"
+    print "   add                     - add jobs, reading from stdin"
+    print "   list <criteria> <value> - list jobs matching criteria"
+    sys.exit(1)
+
+def add():
+    for line in sys.stdin.readlines():
+        args = line.strip().split(' ')
+        if len(args) == 3:
+            Rebuildd().add_job(args[0], args[1], args[2])
+        if len(args) == 4:
+            Rebuildd().add_job(args[0], args[1], args[2], mailto=None, arch=args[3])
+        if len(args) == 5:
+            Rebuildd().add_job(args[0], args[1], args[2], mailto=args[4], arch=args[3])
+    else:
+        print "E: usage: %s\n   read <package> <version> <dist> [arch] [mailto] from stdin" % sys.argv[0]
+        sys.exit(1)
+
+def list():
+    if len(sys.argv) == 3:
+        try:
+            (critname, critvalue) = sys.argv[2].split('=')
+        except ValueError:
+            print "E: usage: %s list criteria=value" % os.path.basename(sys.argv[0])
+            return False
+    else:
+        print_jobs(Job.selectBy())
+        return True
+
+    if critname == "package":
+        critvaluepkg = critvalue.split('_')
+        pkgname = critvaluepkg[0]
+        pkgver = None
+        if len(critvaluepkg) > 1:
+            pkgver = critvaluepkg[1]
+        if pkgver:
+            pkgs = Package.selectBy(name=pkgname, version=pkgver)
+        else:
+            pkgs = Package.selectBy(name=pkgname)
+        for pkg in pkgs:
+            print_jobs(Job.selectBy(package=pkg))
+
+    if critname == "arch":
+        print_jobs(Job.selectBy(arch=critvalue))
+
+    if critname == "dist":
+        print_jobs(Job.selectBy(dist=critvalue))
+
+    if critname == "status":
+        try:
+            print_jobs(Job.selectBy(build_status=getattr(JOBSTATUS, critvalue)))
+        except AttributeError:
+            print "E: unknown status"
+            sys.exit(1)
+
+    if critname == "id":
+        print_jobs(Job.selectBy(id=critvalue))
+
+
+def print_headers():
+    print "  id  |     package name     |    version     |    status    |  dist  |  arch  "
+    print "------+----------------------+----------------+--------------+--------+--------"
+
+def print_jobs(jobs):
+    print_headers()
+    for job in jobs:
+        print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %06.6s" % \
+                (job.id, job.package.name, job.package.version,
+                 JOBSTATUS.whatis(job.build_status),
+                 job.dist, job.arch)
+
+if len(sys.argv) > 1:
+    # Init system
+    Rebuildd()
+    if sys.argv[1] == "add":
+        add()
+    if sys.argv[1] == "list":
+        list()
+else:
+    usage()
