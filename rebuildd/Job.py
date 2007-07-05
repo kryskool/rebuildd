@@ -68,8 +68,10 @@ class Job(threading.Thread, sqlobject.SQLObject):
         try:
             build_log = open(build_log_file, mode)
         except Exception, error:
-            RebuilddLog().error("Unable to open log file %s for job %s: %s" 
-                                 % (build_log_file, self.id, error))
+            # Don't log if file does not exist
+            if error.errno != 2:
+                RebuilddLog().error("Unable to open log file %s for job %s: %s" 
+                                     % (build_log_file, self.id, error))
             return None
         return build_log
 
