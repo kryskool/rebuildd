@@ -41,28 +41,14 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
                 self.send_job(self.path[index:])
                 return
         except Exception, error:
-            self.send_error(error)
+            self.send_error(500, error)
 
-        self.send_notfound()
-
-    def send_notfound(self):
-        self.send_response(404, 'Not Found')
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
-                       + "/error.tpl")
-        self.wfile.write(tpl.render(error="404 Not Found"))
+        self.send_error(404, "Document not found :-(")
 
     def send_hdrs(self):
         self.send_response(200, 'OK')
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-
-    def send_error(self, error=None):
-        self.send_hdrs()
-        tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
-                       + "/error.tpl")
-        self.wfile.write(tpl.render(error=error))
 
     def send_job(self, jobid):
         self.send_hdrs()
@@ -80,7 +66,7 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
                 log = "No build log available"
             self.wfile.write(tpl.render(job=job, log=log))
         else:
-            self.send_error("No such job %s" % jobid)
+            self.send_error(500, "No such job %s" % jobid)
 
     def send_index(self):
         self.send_hdrs()
