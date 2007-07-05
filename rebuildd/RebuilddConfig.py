@@ -103,6 +103,6 @@ class RebuilddConfig(ConfigParser.ConfigParser):
 
         try:
             self.write(file(self.config_file, 'w'))
-        except Excepction, error:
+        except Exception, error:
             return False
         return True
