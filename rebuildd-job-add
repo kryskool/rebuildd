@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# rebuildd-add-job - Add a job to rebuildd
+# rebuildd-job-add - Add a job to rebuildd
 #
 # (c) 2007 - Julien Danjou <acid@debian.org>
 #
