@@ -41,6 +41,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
     status_lock = threading.Lock()
+    build_time = sqlobject.IntCol(default=0)
     notify = None
 
     def __init__(self, *args, **kwargs):
@@ -89,6 +90,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
         with self.status_lock:
             self.build_status = JOBSTATUS.BUILDING
 
+        build_start_time = time.time()
+
         # download package for our dist
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
                     Dists().dists[self.dist].get_build_cmd(self.package),
@@ -136,6 +139,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
             build_log.write("\nJob killed on request\n")
 
         build_log.close()
+
+        build_time = int(time.time() - build_start_time)
 
         # Send event to Rebuildd to inform it that it can
         # run a brand new job!
