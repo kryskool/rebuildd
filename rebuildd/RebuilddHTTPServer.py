@@ -51,7 +51,6 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def send_job(self, jobid):
-        self.send_hdrs()
         tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
                        + "/job.tpl")
         job = RebuilddHTTPServer.http_rebuildd.get_job(int(jobid))
@@ -64,6 +63,7 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
                     log += line
             else:
                 log = "No build log available"
+            self.send_hdrs()
             self.wfile.write(tpl.render(job=job, log=log))
         else:
             self.send_error(500, "No such job %s" % jobid)
