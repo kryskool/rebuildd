@@ -20,27 +20,23 @@
 
 from rebuildd.Rebuildd import Rebuildd
 from rebuildd.RebuilddConfig import RebuilddConfig
-import sqlobject, os
+import sqlobject, sys
 
-# Create database if we use sqlite and it does not exists
-def create_sqlite_db():
-    uri = RebuilddConfig().get('build', 'database_uri')
-    if uri.startswith("sqlite:"):
-        index = uri.find("/")
-        db = uri[index:]
-    else:
-        return False
-    if not os.path.exists(db):
+# Create database
+def create_db():
+    try:
         sqlobject.sqlhub.processConnection = \
             sqlobject.connectionForURI(RebuilddConfig().get('build', 'database_uri'))
         from rebuildd.Package import Package
         from rebuildd.Job import Job
         Package.createTable()
         Job.createTable()
-        return True
+        return 0
+    except Exception, error:
+        print "E: %s" % error
+        return 1
 
-    return False
-
-create_sqlite_db()
+if len(sys.argv) == 2 and sys.argv[1] == "init":
+    sys.exit(create_db())
 
 Rebuildd().daemon()
