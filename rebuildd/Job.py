@@ -41,6 +41,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
     status_lock = threading.Lock()
+    notify = None
 
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
@@ -54,6 +55,9 @@ class Job(threading.Thread, sqlobject.SQLObject):
                        JOBSTATUS.whatis(self.build_status),
                        JOBSTATUS.whatis(value)))
         sqlobject.SQLObject.__setattr__(self, name, value)
+
+    def set_notify(self, notify):
+        self.notify = notify
 
     def open_logfile(self, mode="r"):
         build_log_file = "%s/%s_%s-%s-%s-%s.%s.log" % (RebuilddConfig().get('log', 'logs_dir'),
@@ -85,7 +89,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         # download package for our dist
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
-                    Dists().dists[self.dist].get_build_cmd(self.package)
+                    Dists().dists[self.dist].get_build_cmd(self.package),
                     Dists().dists[self.dist].get_post_build_cmd(self.package)):
             try:
                 proc = subprocess.Popen(cmd.split(), bufsize=0,
@@ -108,8 +112,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
             if state == 0:
                 self.build_status = JOBSTATUS.BUILD_OK
             else:
-                if state != None:
-                    self.build_status = JOBSTATUS.BUILD_FAILED
+                self.build_status = JOBSTATUS.BUILD_FAILED
 
 
         if self.do_quit.isSet():
@@ -133,6 +136,11 @@ class Job(threading.Thread, sqlobject.SQLObject):
             build_log.write("\nJob killed on request\n")
 
         build_log.close()
+
+        # Send event to Rebuildd to inform it that it can
+        # run a brand new job!
+        if self.notify:
+            self.notify.set()
 
         self.send_build_log()
 

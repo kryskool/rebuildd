@@ -30,8 +30,9 @@ def create_sqlite_db():
         db = uri[index:]
     else:
         return False
-    connect_db()
     if not os.path.exists(db):
+        sqlobject.sqlhub.processConnection = \
+            sqlobject.connectionForURI(RebuilddConfig().get('build', 'database_uri'))
         from rebuildd.Package import Package
         from rebuildd.Job import Job
         Package.createTable()
@@ -40,11 +41,6 @@ def create_sqlite_db():
 
     return False
 
-def connect_db():
-    sqlobject.sqlhub.processConnection = \
-        sqlobject.connectionForURI(RebuilddConfig().get('build', 'database_uri'))
-
-if not create_sqlite_db():
-    connect_db()
+create_sqlite_db()
 
 Rebuildd().daemon()

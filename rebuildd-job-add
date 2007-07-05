@@ -26,17 +26,14 @@ def connect_db():
     sqlobject.sqlhub.processConnection = \
         sqlobject.connectionForURI(RebuilddConfig().get('build', 'database_uri'))
 
-connect_db()
-
-if len(sys.argv) == 4:
-    Rebuildd().add_job(sys.argv[1], sys.argv[2], sys.argv[3])
-    sys.exit(0)
-if len(sys.argv) == 5:
-    Rebuildd().add_job(sys.argv[1], sys.argv[2], sys.argv[3], mailto=None, arch=sys.argv[4])
-    sys.exit(0)
-if len(sys.argv) == 6:
-    Rebuildd().add_job(sys.argv[1], sys.argv[2], sys.argv[3], mailto=sys.argv[5], arch=sys.argv[4])
-    sys.exit(0)
-
-print "E: usage: %s <name> <version> <dist> [arch] [mailto]" % sys.argv[0]
-sys.exit(1)
+for line in sys.stdin.readlines():
+    args = line.strip().split(' ')
+    if len(args) == 3:
+        Rebuildd().add_job(args[0], args[1], args[2])
+    if len(args) == 4:
+        Rebuildd().add_job(args[0], args[1], args[2], mailto=None, arch=args[3])
+    if len(args) == 5:
+        Rebuildd().add_job(args[0], args[1], args[2], mailto=args[4], arch=args[3])
+else:
+    print "E: usage: %s\n   read <package> <version> <dist> [arch] [mailto] from stdin" % sys.argv[0]
+    sys.exit(1)

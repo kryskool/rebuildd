@@ -32,7 +32,7 @@ from RebuilddHTTPServer import RebuilddHTTPServer
 from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
-import threading, os, time, sys
+import threading, os, time, sys, sqlobject
 
 __version__ = "$Rev$"
 
@@ -40,6 +40,7 @@ class Rebuildd:
     jobs = []
     do_quit = threading.Event()
     jobs_locker = threading.Lock()
+    job_finished = threading.Event()
     _instance = None 
          
     def __new__(cls):  
@@ -51,6 +52,9 @@ class Rebuildd:
         self.cfg = RebuilddConfig()
         # Init arch
         self.log = RebuilddLog()
+
+        sqlobject.sqlhub.processConnection = \
+            sqlobject.connectionForURI(self.cfg.get('build', 'database_uri')) 
 
         # Create distributions
         for dist in self.cfg.get('build', 'dists').split(' '):
@@ -137,6 +141,7 @@ class Rebuildd:
                 with job.status_lock:
                     if job.build_status == JOBSTATUS.WAIT and not job.isAlive():
                         self.log.info("Starting new thread for job %s" % job.id)
+                        job.set_notify(self.job_finished)
                         job.setDaemon(True)
                         job.start()
                         jobs_started += 1
@@ -246,7 +251,8 @@ class Rebuildd:
 
         counter = int(self.cfg.get('build', 'check_every'))
         while not self.do_quit.isSet():
-            if counter == int(self.cfg.get('build', 'check_every')):
+            if counter == int(self.cfg.get('build', 'check_every')) \
+               or self.job_finished.isSet():
                 self.read_new_jobs()
                 # Start jobs
                 self.start_jobs()
@@ -255,7 +261,8 @@ class Rebuildd:
                 # Clean finished jobs
                 self.clean_jobs()
                 counter = 0
-            time.sleep(1)
+                self.job_finished.clear()
+            self.do_quit.wait(1)
             counter += 1
 
         self.log.info("Killing rebuildd")
