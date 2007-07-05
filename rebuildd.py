@@ -31,10 +31,11 @@ def create_db():
         from rebuildd.Job import Job
         Package.createTable()
         Job.createTable()
-        return 0
     except Exception, error:
         print "E: %s" % error
         return 1
+
+    return 0
 
 if len(sys.argv) == 2 and sys.argv[1] == "init":
     sys.exit(create_db())
