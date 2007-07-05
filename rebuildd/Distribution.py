@@ -26,7 +26,6 @@ class Distribution(object):
 
     def __init__(self, name):
         self.name = name
-        RebuilddLog().info("Distribution %s/%s available" % (name, RebuilddConfig().arch))
 
     def get_source_cmd(self, package):
         """Return command used for grabing source for this distribution"""
