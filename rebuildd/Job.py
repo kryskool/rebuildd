@@ -116,7 +116,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
             else:
                 self.build_status = JOBSTATUS.BUILD_FAILED
 
-
         if self.do_quit.isSet():
             # Kill gently the process
             RebuilddLog().info("Killing job %s with SIGINT" % self.id)
@@ -133,8 +132,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
 
             with self.status_lock:
-                if self.build_status == JOBSTATUS.BUILDING:
-                    self.build_status = JOBSTATUS.WAIT
+                self.build_status = JOBSTATUS.WAIT
             build_log.write("\nJob killed on request\n")
 
         build_log.close()
