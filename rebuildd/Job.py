@@ -199,8 +199,14 @@ class Job(threading.Thread, sqlobject.SQLObject):
         try:
             smtp = smtplib.SMTP()
             smtp.connect()
-            smtp.sendmail(RebuilddConfig().get('mail', 'from'),
-                          self.mailto, msg.as_string())
+            if self.mailto:
+                smtp.sendmail(RebuilddConfig().get('mail', 'from'),
+                              self.mailto,
+                              msg.as_string())
+            else:
+                smtp.sendmail(RebuilddConfig().get('mail', 'from'),
+                              RebuilddConfig().get('mail', 'mailto'),
+                              msg.as_string())
             with self.status_lock:
                 if self.build_status == JOBSTATUS.BUILD_OK:
                     self.build_status = JOBSTATUS.OK
