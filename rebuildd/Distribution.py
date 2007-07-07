@@ -36,6 +36,12 @@ class Distribution(object):
     def get_build_cmd(self, package):
         """Return command used for building source for this distribution"""
 
+        # Strip epochs (x:) away
+        index = RebuilddConfig().get('build', 'build_cmd').index(":")
+        if index:
+            return RebuilddConfig().get('build', 'build_cmd')[index+1:] \
+                    % (self.name, package.name, package.version)
+
         return RebuilddConfig().get('build', 'build_cmd') \
                 % (self.name, package.name, package.version)
 
