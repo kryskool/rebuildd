@@ -34,7 +34,9 @@ def usage():
     sys.exit(1)
 
 def add():
+    empty = True
     for line in sys.stdin.readlines():
+        empty = False
         args = line.strip().split(' ')
         if len(args) == 3:
             Rebuildd().add_job(args[0], args[1], args[2])
@@ -42,7 +44,7 @@ def add():
             Rebuildd().add_job(args[0], args[1], args[2], mailto=None, arch=args[3])
         if len(args) == 5:
             Rebuildd().add_job(args[0], args[1], args[2], mailto=args[4], arch=args[3])
-    else:
+    if empty:
         print "E: usage: %s\n   read <package> <version> <dist> [arch] [mailto] from stdin" % sys.argv[0]
         sys.exit(1)
 
