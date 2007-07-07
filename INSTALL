@@ -1,8 +1,0 @@
-If you use SQLite, you don't need to create tables.
-
-Create three pbuilder archives
-pbuilder create --basetgz /tmp/etch.tgz --distribution etch --mirror http://ftp.debian.org/debian
-pbuilder create --basetgz /tmp/lenny.tgz --distribution lenny --mirror http://ftp.debian.org/debian
-pbuilder create --basetgz /tmp/sid.tgz --distribution sid --mirror http://ftp.debian.org/debian
-
-<unfinished>
