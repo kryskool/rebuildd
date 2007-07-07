@@ -173,7 +173,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
         if self.mailto:
             msg['To'] = self.mailto
         else:
-            msg['To'] = RebuilddConfig().get('mail', 'to')
+            msg['To'] = RebuilddConfig().get('mail', 'mailto')
         msg['From'] = RebuilddConfig().get('mail', 'from')
         msg['Subject'] = RebuilddConfig().get('mail', 'subject_prefix') + \
                                  " Log for %s build of %s_%s on %s/%s" % \
