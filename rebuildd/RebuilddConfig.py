@@ -17,12 +17,12 @@
 #
 
 import ConfigParser
-import os, socket
+import os
 
 class RebuilddConfig(ConfigParser.ConfigParser):
     """Main configuration singleton"""
 
-    config_file = os.environ['HOME'] + "/.rebuilddrc"
+    config_file = "/etc/rebuildd/rebuilddrc"
     _instance = None
 
     def __new__(cls):
@@ -44,33 +44,29 @@ class RebuilddConfig(ConfigParser.ConfigParser):
         self.set('build', 'check_every', '300')
         self.set('build', 'max_threads', '2')
         self.set('build', 'source_cmd', 'apt-get -qq -t %s source %s=%s')
-        self.set('build', 'build_cmd', 'pbuilder build --basetgz /tmp/%s.tgz %s_%s.dsc')
+        self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/%s.tgz %s_%s.dsc')
         self.set('build', 'post_build_cmd', '')
         self.set('build', 'dists', 'etch lenny sid')
-        self.set('build', 'work_dir', '/tmp')
-        self.set('build', 'database_uri', 'sqlite://%s/rebuildd.db' \
-                                           % os.environ['HOME'])
+        self.set('build', 'work_dir', '/var/cache/rebuildd/build')
+        self.set('build', 'database_uri', 'sqlite:///var/lib/rebuildd/rebuildd.db')
 
-        self.set('mail', 'from', 'rebuildd@%s' % socket.getfqdn())
-        self.set('mail', 'mailto', 'rebuildd@%s' % socket.getfqdn())
+        self.set('mail', 'from', 'rebuildd@localhost')
+        self.set('mail', 'mailto', 'rebuildd@localhost')
         self.set('mail', 'subject_prefix', '[rebuildd]')
 
         self.set('telnet', 'port', '9999')
         self.set('telnet', 'ip', '0.0.0.0')
-        self.set('telnet', 'prompt', 'rebuildd@%s->' % socket.gethostname())
-        self.set('telnet', 'motd', 'Connected on rebuildd on %s' \
-                                    % socket.getfqdn())
-
+        self.set('telnet', 'prompt', 'rebuildd@localhost->')
+        self.set('telnet', 'motd', 'Connected on rebuildd on localhost')
         self.set('http', 'port', '9998')
         self.set('http', 'ip', '0.0.0.0')
         # This is dedicated to MadCoder
         self.set('http', 'log_lines_nb', '30')
-        self.set('http', 'templates_dir', '%s/templates' \
-                                          % os.environ['HOME'])
+        self.set('http', 'templates_dir', '/usr/share/rebuildd/templates')
 
-        self.set('log', 'file', os.environ['HOME'] + "/rebuildd.log")
+        self.set('log', 'file', "/var/log/rebuildd/rebuildd.log")
         self.set('log', 'time_format', "%d-%m-%Y %H:%M:%S")
-        self.set('log', 'logs_dir', "%s/logs" % os.environ['HOME'])
+        self.set('log', 'logs_dir', "/var/log/rebuildd/build_logs")
         self.set('log', 'mail', '1')
 
         parch = os.popen("dpkg --print-architecture")
