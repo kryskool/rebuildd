@@ -94,12 +94,15 @@ def print_headers():
     print "------+----------------------+----------------+--------------+--------+--------"
 
 def print_jobs(jobs):
-    print_headers()
-    for job in jobs:
-        print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %06.6s" % \
-                (job.id, job.package.name, job.package.version,
-                 JOBSTATUS.whatis(job.build_status),
-                 job.dist, job.arch)
+    try:
+        print_headers()
+        for job in jobs:
+            print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %06.6s" % \
+                    (job.id, job.package.name, job.package.version,
+                     JOBSTATUS.whatis(job.build_status),
+                     job.dist, job.arch)
+    except IOError:
+        pass
 
 if len(sys.argv) > 1:
     # Init system
