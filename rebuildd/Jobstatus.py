@@ -1,5 +1,3 @@
-#!/usr/bin/env python 
-# 
 # rebuildd - Debian packages rebuild tool 
 # 
 # (c) 2007 - Julien Danjou <acid@debian.org> 
