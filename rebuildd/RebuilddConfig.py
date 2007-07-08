@@ -30,7 +30,7 @@ class RebuilddConfig(ConfigParser.ConfigParser):
             cls._instance = object.__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, dontparse=False):
         ConfigParser.ConfigParser.__init__(self)
 
         # add default sections
@@ -73,7 +73,8 @@ class RebuilddConfig(ConfigParser.ConfigParser):
         self.arch = parch.readline().strip()
         parch.close()
 
-        self.reload()
+        if not dontparse:
+            self.reload()
         self.save()
 
     def reload(self):
