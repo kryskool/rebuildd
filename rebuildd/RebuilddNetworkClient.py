@@ -114,13 +114,6 @@ class RebuilddNetworkClient(threading.Thread):
         """Show version"""
         return __version__ + "\n"
 
-    def exec_cmd_kill(self, *args):
-        """Kill rebuildd and all jobs"""
-
-        self.rebuildd.do_quit.set()
-        return "I: killing rebuildd\n"
-
-
     def exec_cmd_job(self, *args):
         """Manipulate jobs"""
 

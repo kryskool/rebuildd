@@ -30,7 +30,8 @@ from RebuilddHTTPServer import RebuilddHTTPServer
 from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
-import threading, os, time, sys, sqlobject
+import threading, os, time, sys, signal
+import sqlobject
 
 __version__ = "$Rev$"
 
@@ -244,8 +245,14 @@ class Rebuildd:
 
         return True
 
+    def handle_sigterm(self, signum, stack):
+        self.log.info("Receiving transmission... it's a SIGTERM capt'ain!")
+        self.do_quit.set()
+
     def loop(self):
         """Rebuildd main loop"""
+
+        signal.signal(signal.SIGTERM, self.handle_sigterm)
 
         counter = int(self.cfg.get('build', 'check_every'))
         while not self.do_quit.isSet():
@@ -263,7 +270,6 @@ class Rebuildd:
             self.do_quit.wait(1)
             counter += 1
 
-        self.log.info("Killing rebuildd")
         # On exit
         self.log.info("Sending last logs")
         self.send_build_logs()
