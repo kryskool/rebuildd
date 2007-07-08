@@ -21,5 +21,5 @@ PBUILDER_BIN=/usr/sbin/pbuilder
 # Distributions to generate and manage
 DISTS="etch lenny sid"
 
-# Set to 1 to enable pbuilder update in cron
-ENABLE_PBUILDER_CRON=0
+# Set to 1 to enable pbuilder/cowbuilder update in cron
+ENABLE_BUILDER_MAINT=0

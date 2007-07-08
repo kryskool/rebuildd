@@ -14,7 +14,7 @@ then
     . /etc/default/rebuildd
 fi
 
-test "$ENABLE_PBUILDER_CRON" = 0 && exit 0
+test "$ENABLE_BUILDER_MAINT" = 0 && exit 0
 
 function pbuilder_update
 {
