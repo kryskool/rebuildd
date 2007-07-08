@@ -43,7 +43,7 @@ function cowbuilder_create
         echo "I: Initializing cowbuilder for $DISTS"
         for d in $DISTS
         do
-            $COWBUILDER_BIN create --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
+            $COWBUILDER_BIN --create --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
         done
 
         echo "I: Init done, please remember to set rebuildd configuration to the correct value:"

@@ -43,7 +43,7 @@ function cowbuilder_update
         echo "I: Updating cowbuilder for $DISTS"
         for d in $DISTS
         do
-            $COWBUILDER_BIN update --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
+            $COWBUILDER_BIN --update --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
         done
 }
 
