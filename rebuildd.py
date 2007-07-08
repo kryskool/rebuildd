@@ -37,7 +37,11 @@ def create_db():
 
     return 0
 
-if len(sys.argv) == 2 and sys.argv[1] == "init":
-    sys.exit(create_db())
+if len(sys.argv) == 2:
+    if sys.argv[1] == "init":
+        sys.exit(create_db())
+    if sys.argv[1] == "dumpconfig":
+        print RebuilddConfig().dump()
+        sys.exit(0)
 
 Rebuildd().daemon()
