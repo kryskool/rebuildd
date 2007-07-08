@@ -1,0 +1,56 @@
+#! /bin/sh
+
+# Exit on errors
+set +e
+
+# Use pbuilder by default
+PBUILDER_BIN="/usr/sbin/pbuilder"
+PBUILDER_CACHE_PATH="/var/cache/pbuilder"
+PBUILDER_MIRROR="http://ftp.debian.org/debian"
+
+if [ -f /etc/default/rebuildd ]
+then
+    unset PBUILDER_BIN
+    . /etc/default/rebuildd
+fi
+
+test "$ENABLE_PBUILDER_CRON" = 0 && exit 0
+
+function pbuilder_update
+{
+        if [ ! -x "$PBUILDER_BIN" ]
+        then
+            echo "E: pbuilder not found: $PBUILDER_BIN"
+            exit 1
+        fi
+
+        echo "I: Updating pbuilder for $DISTS"
+        for d in $DISTS
+        do
+            $PBUILDER_BIN update --basetgz $PBUILDER_CACHE_PATH/${d}.tgz --distribution $d --mirror $PBUILDER_MIRROR
+        done
+}
+
+
+function cowbuilder_update
+{
+        if [ ! -x "$COWBUILDER_BIN" ]
+        then
+            echo "E: cowbuilder not found: $COWBUILDER_BIN"
+            exit 1
+        fi
+
+        echo "I: Updating cowbuilder for $DISTS"
+        for d in $DISTS
+        do
+            $COWBUILDER_BIN update --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
+        done
+}
+
+
+if [ ! -z "$COWBUILDER_BIN" ]
+then
+    cowbuilder_update
+else
+    pbuilder_update
+fi

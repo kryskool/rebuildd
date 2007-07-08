@@ -1,0 +1,59 @@
+#! /bin/sh
+
+# Exit on errors
+set +e
+
+# Use pbuilder by default
+PBUILDER_BIN="/usr/sbin/pbuilder"
+PBUILDER_CACHE_PATH="/var/cache/pbuilder"
+PBUILDER_MIRROR="http://ftp.debian.org/debian"
+
+if [ -f /etc/default/rebuildd ]
+then
+    unset PBUILDER_BIN
+    . /etc/default/rebuildd
+fi
+
+function pbuilder_create
+{
+        if [ ! -x "$PBUILDER_BIN" ]
+        then
+            echo "E: pbuilder not found: $PBUILDER_BIN"
+            exit 1
+        fi
+
+        echo "I: Initializing pbuilder for $DISTS"
+        for d in $DISTS
+        do
+            $PBUILDER_BIN create --basetgz $PBUILDER_CACHE_PATH/${d}.tgz --distribution $d --mirror $PBUILDER_MIRROR
+        done
+        echo "I: Init done, please remember to set rebuildd configuration to the correct value:"
+        echo "build_cmd = pbuilder build --basetgz $PBUILDER_CACHE_PATH/%s.tgz %s_%s.dsc"
+}
+
+
+function cowbuilder_create
+{
+        if [ ! -x "$COWBUILDER_BIN" ]
+        then
+            echo "E: cowbuilder not found: $COWBUILDER_BIN"
+            exit 1
+        fi
+
+        echo "I: Initializing cowbuilder for $DISTS"
+        for d in $DISTS
+        do
+            $COWBUILDER_BIN create --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
+        done
+
+        echo "I: Init done, please remember to set rebuildd configuration to the correct value:"
+        echo "build_cmd = cowbuilder build --basepath $PBUILDER_CACHE_PATH/%s.cow %s_%s.dsc"
+}
+
+
+if [ ! -z "$COWBUILDER_BIN" ]
+then
+    cowbuilder_create
+else
+    pbuilder_create
+fi

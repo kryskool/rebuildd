@@ -1,0 +1,5 @@
+maintenance etc/rebuildd
+rebuildd-init-build-system usr/sbin
+rebuildd-job usr/sbin
+debian/rebuilddrc /etc/rebuildd
+templates usr/share/rebuildd

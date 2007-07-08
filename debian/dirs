@@ -1,0 +1,5 @@
+usr/sbin
+etc/rebuildd/maintenance
+var/lib/rebuildd
+var/cache/rebuildd/build
+var/log/rebuildd/build_logs

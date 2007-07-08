@@ -1,0 +1,25 @@
+# Defaults for rebuildd initscript
+# sourced by /etc/init.d/rebuildd
+
+# Set to 1 to enable rebuildd
+START_REBUILDD=0
+
+# The variables below are used by various shell scripts
+# to manage your pbuilder instances.
+
+# Set this to your pbuilder path
+# You can also use cowbuilder instead
+PBUILDER_BIN=/usr/sbin/pbuilder
+#COWBUILDER_BIN=/usr/sbin/cowbuilder
+
+# Specift cache path
+# PBUILDER_CACHE_PATH="/var/cache/pbuilder"
+
+# Default Debian mirror
+# PBUILDER_MIRROR=http://ftp.debian.org/debian
+
+# Distributions to generate and manage
+DISTS="etch lenny sid"
+
+# Set to 1 to enable pbuilder update in cron
+ENABLE_PBUILDER_CRON=0
