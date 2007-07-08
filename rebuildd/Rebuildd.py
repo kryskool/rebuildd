@@ -140,7 +140,7 @@ class Rebuildd:
         """Start waiting jobs"""
 
         running_threads = self.count_running_jobs()
-        max_threads = max(overrun, int(self.cfg.get('build', 'max_threads')))
+        max_threads = max(overrun, self.cfg.getint('build', 'max_threads'))
         jobs_started = 0
 
         with self.jobs_locker:
@@ -263,9 +263,9 @@ class Rebuildd:
     def loop(self):
         """Rebuildd main loop"""
 
-        counter = int(self.cfg.get('build', 'check_every'))
+        counter = self.cfg.getint('build', 'check_every')
         while not self.do_quit.isSet():
-            if counter == int(self.cfg.get('build', 'check_every')) \
+            if counter == self.cfg.getint('build', 'check_every') \
                or self.job_finished.isSet():
                 self.read_new_jobs()
                 # Start jobs

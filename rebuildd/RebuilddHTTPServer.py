@@ -56,7 +56,7 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
             build_log = job.open_logfile("r")
             if build_log:
                 log = ""
-                nblines = int(RebuilddConfig().get('http', 'log_lines_nb'))
+                nblines = RebuilddConfig().getint('http', 'log_lines_nb')
                 for line in build_log.readlines()[-nblines:]:
                     log += line
             else:
@@ -80,7 +80,7 @@ class RebuilddHTTPServer(threading.Thread, HTTPServer):
         threading.Thread.__init__(self)
         HTTPServer.__init__(self,
                             (RebuilddConfig().get('http', 'ip'),
-                             int(RebuilddConfig().get('http', 'port'))),
+                             RebuilddConfig().getint('http', 'port')),
                             RebuilddHTTPHandler)
         self.rebuildd = rebuildd
         RebuilddHTTPServer.http_rebuildd = rebuildd

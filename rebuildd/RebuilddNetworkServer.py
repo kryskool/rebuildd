@@ -34,7 +34,7 @@ class RebuilddNetworkServer(threading.Thread):
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.settimeout(1)
         self.socket.bind((RebuilddConfig().get('telnet', 'ip'),
-                          int(RebuilddConfig().get('telnet', 'port'))))
+                          RebuilddConfig().getint('telnet', 'port')))
         self.socket.listen(2)
         while not self.rebuildd.do_quit.isSet():
             try:

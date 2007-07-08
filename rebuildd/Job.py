@@ -154,7 +154,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
            self.build_status != JOBSTATUS.BUILD_FAILED:
             return False
 
-        if not int(RebuilddConfig().get('log', 'mail')):
+        if not RebuilddConfig().getboolean('log', 'mail'):
             with self.status_lock:
                 if self.build_status == JOBSTATUS.BUILD_OK:
                     self.build_status = JOBSTATUS.OK
