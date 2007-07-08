@@ -63,8 +63,8 @@ class Rebuildd:
         self.log.info("Starting rebuildd %s" % __version__)
         self.daemonize()
 
-        self.log.info("Launching network servers")
         # Run the network server thread
+        self.log.info("Launching network servers")
         self.netserv = RebuilddNetworkServer(self)
         self.netserv.setDaemon(True)
         self.netserv.start()
@@ -72,12 +72,25 @@ class Rebuildd:
         self.httpd.setDaemon(True)
         self.httpd.start()
 
-        self.log.info("Running main loop")
         # Run main loop
+        self.log.info("Running main loop")
         self.loop()
+
+        # On exit
+        self.log.info("Sending last logs")
+        self.send_build_logs()
+        self.log.info("Cleaning finished and canceled jobs")
+        self.clean_jobs()
+        self.log.info("Stopping all jobs")
+        self.stop_all_jobs()
+        self.netserv.join(10)
+        self.httpd.join(10)
+        self.log.info("Exiting rebuildd")
 
     def daemonize(self):
         """Do daemon stuff"""
+
+        signal.signal(signal.SIGTERM, self.handle_sigterm)
 
         try:
             os.chdir(self.cfg.get('build', 'work_dir'))
@@ -252,8 +265,6 @@ class Rebuildd:
     def loop(self):
         """Rebuildd main loop"""
 
-        signal.signal(signal.SIGTERM, self.handle_sigterm)
-
         counter = int(self.cfg.get('build', 'check_every'))
         while not self.do_quit.isSet():
             if counter == int(self.cfg.get('build', 'check_every')) \
@@ -270,14 +281,4 @@ class Rebuildd:
             self.do_quit.wait(1)
             counter += 1
 
-        # On exit
-        self.log.info("Sending last logs")
-        self.send_build_logs()
-        self.log.info("Cleaning finished and canceled jobs")
-        self.clean_jobs()
-        self.log.info("Stopping all jobs")
-        self.stop_all_jobs()
-        self.netserv.join(10)
-        self.httpd.join(10)
-        self.log.info("Exiting rebuildd")
 
