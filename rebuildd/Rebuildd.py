@@ -100,10 +100,8 @@ class Rebuildd:
 
         try:
             sys.stdout = sys.stderr = file(self.cfg.get('log', 'file'), "a")
-            if os.fork():
-                sys.exit(0)
         except Exception, error:
-            print "E: unable to fork: %s" % error
+            print "E: unable to open logfile: %s" % error
 
     def get_job(self, jobid):
         for job in self.jobs:
