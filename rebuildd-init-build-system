@@ -47,7 +47,7 @@ function cowbuilder_create
         done
 
         echo "I: Init done, please remember to set rebuildd configuration to the correct value:"
-        echo "build_cmd = cowbuilder build --basepath $PBUILDER_CACHE_PATH/%s.cow %s_%s.dsc"
+        echo "build_cmd = cowbuilder --build --basepath $PBUILDER_CACHE_PATH/%s.cow %s_%s.dsc"
 }
 
 
