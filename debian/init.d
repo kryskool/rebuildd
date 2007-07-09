@@ -1,6 +1,18 @@
 #! /bin/sh
-
 # rebuildd init script
+#
+### BEGIN INIT INFO
+# Provides:          rebuildd
+# Required-Start:
+# Required-Stop:
+# Should-Start:      $local_fs $network
+# Should-Stop:       $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: rebuild daemon
+# Description:       daemon providing rebuild system
+#                    for Debian packages
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/rebuildd
