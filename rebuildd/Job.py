@@ -138,7 +138,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         build_log.close()
 
-        build_time = int(time.time() - build_start_time)
+        self.build_time = int(time.time() - build_start_time)
 
         # Send event to Rebuildd to inform it that it can
         # run a brand new job!
