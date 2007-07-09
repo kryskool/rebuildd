@@ -235,13 +235,19 @@ class Rebuildd:
             # Maybe we found no packages, so create a brand new one!
             pkg = Package(name=name, version=version)
 
+        jobs = Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT)
+        if jobs.count():
+            self.log.error("Job already existing for %s_%s on %s/%s, don't adding it" \
+                           % (pkg.name, pkg.version, dist, arch))
+            return False
+
         job = Job(package=pkg, dist=dist, arch=arch)
         job.build_status = JOBSTATUS.WAIT
         job.arch = arch
         job.mailto = mailto
 
         self.log.info("Added job for %s_%s on %s/%s for %s" \
-                   % (name, version, dist, arch, mailto))
+                      % (name, version, dist, arch, mailto))
         return True
 
     def clean_jobs(self):
