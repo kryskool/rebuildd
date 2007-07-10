@@ -113,7 +113,12 @@ class Rebuildd:
 
         return None
 
-    def read_new_jobs(self):
+    def get_all_jobs(self, **kwargs):
+        jobs = []
+        jobs.extend(Job.selectBy(**kwargs))
+        return jobs
+
+    def get_new_jobs(self):
         """Feed jobs list with waiting jobs and lock them"""
 
         max_new = self.cfg.getint('build', 'max_jobs')
@@ -303,7 +308,7 @@ class Rebuildd:
         while not self.do_quit.isSet():
             if counter == self.cfg.getint('build', 'check_every') \
                or self.job_finished.isSet():
-                self.read_new_jobs()
+                self.get_new_jobs()
                 # Start jobs
                 self.start_jobs()
                 # Try to resend build logs if failed

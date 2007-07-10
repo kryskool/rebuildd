@@ -54,7 +54,7 @@
           % if job.build_status == 1000:
             <td bgcolor="green" align="center">OK
           % endif
-          <td>${job.host}</td>
+          <td><a href="/host_${job.host}">${job.host}</a></td>
           <td>${job.build_start}</td>
           <td>${job.build_end}</td>
           </td>

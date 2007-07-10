@@ -36,7 +36,11 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
                 return
             if self.path[1:].startswith("job_"):
                 index = self.path.rindex('_') + 1
-                self.send_job(self.path[index:])
+                self.send_job(int(self.path[index:]))
+                return
+            if self.path[1:].startswith("host_"):
+                index = self.path.rindex('_') + 1
+                self.send_index(host=self.path[index:])
                 return
         except Exception, error:
             self.send_error(500, error)
@@ -51,8 +55,9 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
     def send_job(self, jobid):
         tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
                        + "/job.tpl")
-        job = RebuilddHTTPServer.http_rebuildd.get_job(int(jobid))
-        if job:
+        job = RebuilddHTTPServer.http_rebuildd.get_all_jobs(id=jobid)
+        if len(job):
+            job = job[0]
             build_log = job.open_logfile("r")
             if build_log:
                 log = ""
@@ -66,12 +71,13 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
         else:
             self.send_error(500, "No such job %s" % jobid)
 
-    def send_index(self):
+    def send_index(self, **kwargs):
         self.send_hdrs()
         tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
                        + "/index.tpl")
         self.wfile.write(tpl.render(host=socket.getfqdn(), \
-                                    jobs=RebuilddHTTPServer.http_rebuildd.jobs))
+                                    jobs=RebuilddHTTPServer.http_rebuildd.get_all_jobs(**kwargs)))
+
 
 class RebuilddHTTPServer(threading.Thread, HTTPServer):
     """Main HTTP server"""
