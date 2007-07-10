@@ -43,6 +43,7 @@ class RebuilddConfig(ConfigParser.ConfigParser):
         # add default values
         self.set('build', 'check_every', '300')
         self.set('build', 'max_threads', '2')
+        self.set('build', 'max_jobs', '5')
         self.set('build', 'source_cmd', 'apt-get -qq -t %s source %s=%s')
         self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/%s.tgz %s_%s.dsc')
         self.set('build', 'post_build_cmd', '')

@@ -30,7 +30,7 @@ from RebuilddHTTPServer import RebuilddHTTPServer
 from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
-import threading, os, time, sys, signal
+import threading, os, time, sys, signal, socket
 import sqlobject
 
 __version__ = "$Rev$"
@@ -83,6 +83,8 @@ class Rebuildd:
         self.clean_jobs()
         self.log.info("Stopping all jobs")
         self.stop_all_jobs()
+        self.log.info("Releasing wait-locked jobs")
+        self.release_jobs()
         self.netserv.join(10)
         self.httpd.join(10)
         self.log.info("Exiting rebuildd")
@@ -91,6 +93,7 @@ class Rebuildd:
         """Do daemon stuff"""
 
         signal.signal(signal.SIGTERM, self.handle_sigterm)
+        signal.signal(signal.SIGINT, self.handle_sigterm)
 
         try:
             os.chdir(self.cfg.get('build', 'work_dir'))
@@ -111,17 +114,29 @@ class Rebuildd:
         return None
 
     def read_new_jobs(self):
-        """Feed jobs list with waiting jobs"""
+        """Feed jobs list with waiting jobs and lock them"""
+
+        max_new = self.cfg.getint('build', 'max_jobs')
+        count_current = len(self.jobs)
 
         with self.jobs_locker:
+            if count_current >= max_new:
+                return 0
+
             jobs = []
             for arch in (self.cfg.arch, "all"):
                 jobs.extend(Job.selectBy(build_status=JOBSTATUS.WAIT, arch=arch))
+
             count_new = 0
             for job in jobs:
-                if self.get_job(job.id) == None:
+                if count_current < max_new and self.get_job(job.id) == None:
+                    job.build_status = JOBSTATUS.WAIT_LOCKED
+                    job.host = socket.gethostname()
                     self.jobs.append(job)
                     count_new += 1
+                    count_current += 1
+                else:
+                    break
 
         return count_new
 
@@ -149,7 +164,7 @@ class Rebuildd:
                     break
             
                 with job.status_lock:
-                    if job.build_status == JOBSTATUS.WAIT and not job.isAlive():
+                    if job.build_status == JOBSTATUS.WAIT_LOCKED and not job.isAlive():
                         self.log.info("Starting new thread for job %s" % job.id)
                         job.set_notify(self.job_finished)
                         job.setDaemon(True)
@@ -191,15 +206,16 @@ class Rebuildd:
         with self.jobs_locker:
             job = self.get_job(jobid)
             if job != None:
-                if job.isAlive():
-                    job.do_quit.set()
-                    job.join()
-                job.build_status = JOBSTATUS.CANCELED
-                self.jobs.remove(job)
-                self.log.info("Canceled job %s for %s_%s on %s/%s for %s" \
-                                % (job.id, job.package.name, job.package.version,
-                                job.dist, job.arch, job.mailto))
-                return True
+                    if job.isAlive():
+                        job.do_quit.set()
+                        job.join()
+                    with job.status_lock:
+                        job.build_status = JOBSTATUS.CANCELED
+                    self.jobs.remove(job)
+                    self.log.info("Canceled job %s for %s_%s on %s/%s for %s" \
+                                    % (job.id, job.package.name, job.package.version,
+                                    job.dist, job.arch, job.mailto))
+                    return True
 
         return False
 
@@ -235,8 +251,10 @@ class Rebuildd:
             # Maybe we found no packages, so create a brand new one!
             pkg = Package(name=name, version=version)
 
-        jobs = Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT)
-        if jobs.count():
+        jobs = []
+        jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT))
+        jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT_LOCKED))
+        if len(jobs):
             self.log.error("Job already existing for %s_%s on %s/%s, don't adding it" \
                            % (pkg.name, pkg.version, dist, arch))
             return False
@@ -262,8 +280,20 @@ class Rebuildd:
 
         return True
 
+    def release_jobs(self):
+        """Release jobs"""
+
+        with self.jobs_locker:
+            for job in self.jobs:
+                with job.status_lock:
+                    if job.build_status == JOBSTATUS.WAIT_LOCKED:
+                        job.build_status = JOBSTATUS.WAIT
+                        job.host = ""
+
+        return True
+
     def handle_sigterm(self, signum, stack):
-        self.log.info("Receiving transmission... it's a SIGTERM capt'ain!")
+        self.log.info("Receiving transmission... it's a signal %s capt'ain! EVERYONE OUT!" % signum)
         self.do_quit.set()
 
     def loop(self):

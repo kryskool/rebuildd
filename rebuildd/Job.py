@@ -89,8 +89,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
         with self.status_lock:
             self.build_status = JOBSTATUS.BUILDING
 
-        self.host = socket.gethostname()
-
         build_start_time = time.time()
 
         # download package for our dist
@@ -136,7 +134,11 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
 
             with self.status_lock:
-                self.build_status = JOBSTATUS.WAIT
+                self.build_status = JOBSTATUS.WAIT_LOCKED
+
+            # Reset host
+            self.host = ""
+
             build_log.write("\nJob killed on request\n")
 
         build_log.close()

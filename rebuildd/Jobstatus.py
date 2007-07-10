@@ -20,6 +20,7 @@ from Enumeration import Enumeration
 
 JOBSTATUS = Enumeration([ ("UNKNOWN", 0), 
                           ("WAIT", 100), 
+                          ("WAIT_LOCKED", 150),
                           ("BUILDING", 200), 
                           ("BUILD_FAILED", 300), 
                           ("BUILD_OK", 400), 
