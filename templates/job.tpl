@@ -13,6 +13,7 @@
           <th>Date</th>
           <th>Mail to</th>
           <th>Build status</th>
+          <th>Host</th>
           <th>Build start</th>
           <th>Build end</th>
         </tr>
@@ -51,6 +52,7 @@
             <td bgcolor="green" align="center">OK
           % endif
           </td>
+          <td>${job.host}</td>
           <td>${job.build_start}</td>
           <td>${job.build_end}</td>
         </tr>
