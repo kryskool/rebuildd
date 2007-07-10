@@ -40,6 +40,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
     status_lock = threading.Lock()
     build_time = sqlobject.IntCol(default=0)
+    host = sqlobject.StringCol(default=None)
     notify = None
 
     def __init__(self, *args, **kwargs):
@@ -87,6 +88,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
         # we are building
         with self.status_lock:
             self.build_status = JOBSTATUS.BUILDING
+
+        self.host = socket.gethostname()
 
         build_start_time = time.time()
 

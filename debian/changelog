@@ -1,3 +1,9 @@
+rebuildd (0.2.0) UNRELEASED; urgency=low
+
+  * Stock builder hostname in job table
+
+ -- Julien Danjou <acid@debian.org>  Tue, 10 Jul 2007 10:36:33 +0200
+
 rebuildd (0.1.0) unstable; urgency=low
 
   * Initial release
