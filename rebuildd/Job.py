@@ -91,6 +91,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
             self.build_status = JOBSTATUS.BUILDING
 
         self.build_start = sqlobject.DateTimeCol.now()
+        self.build_endt = None
 
         # download package for our dist
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
