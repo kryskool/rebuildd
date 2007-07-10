@@ -27,6 +27,9 @@
           % if job.build_status == 100:
             <td bgcolor="yellow" align="center">WAIT
           % endif
+          % if job.build_status == 150:
+            <td bgcolor="yellow" align="center">WAIT_LOCKED
+          % endif
           % if job.build_status == 200:
             <td bgcolor="orange" align="center">BUILDING
           % endif
