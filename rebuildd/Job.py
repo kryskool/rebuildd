@@ -113,13 +113,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
             if self.do_quit.isSet() or state != 0:
                 break
 
-        # build is finished
-        with self.status_lock:
-            if state == 0:
-                self.build_status = JOBSTATUS.BUILD_OK
-            else:
-                self.build_status = JOBSTATUS.BUILD_FAILED
-
         if self.do_quit.isSet():
             # Kill gently the process
             RebuilddLog().info("Killing job %s with SIGINT" % self.id)
@@ -143,6 +136,12 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
             build_log.write("\nJob killed on request\n")
 
+        # build is finished
+        with self.status_lock:
+            if state == 0:
+                self.build_status = JOBSTATUS.BUILD_OK
+            else:
+                self.build_status = JOBSTATUS.BUILD_FAILED
         build_log.close()
 
         self.build_end = sqlobject.DateTimeCol.now()
