@@ -4,6 +4,7 @@ rebuildd (0.2.0) UNRELEASED; urgency=low
   * Add new max_jobs config var, used to load max_jobs new jobs
     This adds a new state WAIT_LOCKED for locking jobs handled by a build.
   * Handle SIGINT like SIGTERM
+  * Don't stock build_time, stock build_start and build_end
 
  -- Julien Danjou <acid@debian.org>  Tue, 10 Jul 2007 10:36:33 +0200
 

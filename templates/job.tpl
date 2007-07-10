@@ -13,6 +13,8 @@
           <th>Date</th>
           <th>Mail to</th>
           <th>Build status</th>
+          <th>Build start</th>
+          <th>Build end</th>
         </tr>
         <tr>
           <td>${job.package.name}</td>
@@ -49,6 +51,8 @@
             <td bgcolor="green" align="center">OK
           % endif
           </td>
+          <td>${job.build_start}</td>
+          <td>${job.build_end}</td>
         </tr>
       </table>
       <h3>Build log</h3>
