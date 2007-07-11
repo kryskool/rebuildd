@@ -57,9 +57,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
                        JOBSTATUS.whatis(value)))
         sqlobject.SQLObject.__setattr__(self, name, value)
 
-    def set_notify(self, notify):
-        self.notify = notify
-
     def open_logfile(self, mode="r"):
         build_log_file = "%s/%s_%s-%s-%s-%s.%s.log" % (RebuilddConfig().get('log', 'logs_dir'),
                                            self.package.name, self.package.version,

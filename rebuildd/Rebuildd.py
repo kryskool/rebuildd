@@ -165,7 +165,7 @@ class Rebuildd(object):
                 with job.status_lock:
                     if job.build_status == JOBSTATUS.WAIT_LOCKED and not job.isAlive():
                         RebuilddLog().info("Starting new thread for job %s" % job.id)
-                        job.set_notify(self.job_finished)
+                        job.notify = self.job_finished
                         job.setDaemon(True)
                         job.start()
                         jobs_started += 1
