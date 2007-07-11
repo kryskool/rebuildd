@@ -6,6 +6,8 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/python-distutils.mk
 
 build/rebuildd::
+	@echo Running test suite
+	./tests/runtest.py
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd.manpage.xml
 	echo -e 'from rebuildd.RebuilddConfig import RebuilddConfig\nprint RebuilddConfig(True).dump()' | python > debian/rebuilddrc
 

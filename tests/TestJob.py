@@ -1,7 +1,8 @@
 #!/usr/bin/env python2.5
-import sys
-
-sys.path.append("..")
+import sys  
+  
+sys.path.insert(0, "..")  
+sys.path.insert(0, ".")  
 
 import unittest, types
 import os, copy
