@@ -48,8 +48,6 @@ class Rebuildd:
 
     def __init__(self):
         self.cfg = RebuilddConfig()
-        # Init arch
-        self.log = RebuilddLog()
 
         sqlobject.sqlhub.processConnection = \
             sqlobject.connectionForURI(self.cfg.get('build', 'database_uri')) 
@@ -59,30 +57,30 @@ class Rebuildd:
             Dists().add_dist(Distribution(dist))
 
     def daemon(self):
-        self.log.info("Starting rebuildd %s" % __version__)
+        RebuilddLog().info("Starting rebuildd %s" % __version__)
         self.daemonize()
 
         # Run the network server thread
-        self.log.info("Launching network servers")
+        RebuilddLog().info("Launching network servers")
         self.netserv = RebuilddNetworkServer(self)
         self.netserv.setDaemon(True)
         self.netserv.start()
 
         # Run main loop
-        self.log.info("Running main loop")
+        RebuilddLog().info("Running main loop")
         self.loop()
 
         # On exit
-        self.log.info("Sending last logs")
+        RebuilddLog().info("Sending last logs")
         self.send_build_logs()
-        self.log.info("Cleaning finished and canceled jobs")
+        RebuilddLog().info("Cleaning finished and canceled jobs")
         self.clean_jobs()
-        self.log.info("Stopping all jobs")
+        RebuilddLog().info("Stopping all jobs")
         self.stop_all_jobs()
-        self.log.info("Releasing wait-locked jobs")
+        RebuilddLog().info("Releasing wait-locked jobs")
         self.release_jobs()
         self.netserv.join(10)
-        self.log.info("Exiting rebuildd")
+        RebuilddLog().info("Exiting rebuildd")
 
     def daemonize(self):
         """Do daemon stuff"""
@@ -165,14 +163,14 @@ class Rebuildd:
             
                 with job.status_lock:
                     if job.build_status == JOBSTATUS.WAIT_LOCKED and not job.isAlive():
-                        self.log.info("Starting new thread for job %s" % job.id)
+                        RebuilddLog().info("Starting new thread for job %s" % job.id)
                         job.set_notify(self.job_finished)
                         job.setDaemon(True)
                         job.start()
                         jobs_started += 1
                         running_threads = running_threads + 1
 
-        self.log.info("Running threads: %s/%s" % (running_threads, max_threads))
+        RebuilddLog().info("Running threads: %s/%s" % (running_threads, max_threads))
 
         return jobs_started
 
@@ -212,7 +210,7 @@ class Rebuildd:
                     with job.status_lock:
                         job.build_status = JOBSTATUS.CANCELED
                     self.jobs.remove(job)
-                    self.log.info("Canceled job %s for %s_%s on %s/%s for %s" \
+                    RebuilddLog().info("Canceled job %s for %s_%s on %s/%s for %s" \
                                     % (job.id, job.package.name, job.package.version,
                                     job.dist, job.arch, job.mailto))
                     return True
@@ -226,10 +224,10 @@ class Rebuildd:
             for job in self.jobs:
                 if job.build_status == JOBSTATUS.BUILDING and job.isAlive():
                     job.do_quit.set()
-                    self.log.info("Sending stop to job %s" % job.id)
+                    RebuilddLog().info("Sending stop to job %s" % job.id)
             for job in self.jobs:
                 if job.isAlive():
-                    self.log.info("Waiting for job %s to terminate" % job.id)
+                    RebuilddLog().info("Waiting for job %s to terminate" % job.id)
                     job.join(60)
 
         return True
@@ -255,7 +253,7 @@ class Rebuildd:
         jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT))
         jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT_LOCKED))
         if len(jobs):
-            self.log.error("Job already existing for %s_%s on %s/%s, don't adding it" \
+            RebuilddLog().error("Job already existing for %s_%s on %s/%s, don't adding it" \
                            % (pkg.name, pkg.version, dist, arch))
             return False
 
@@ -264,7 +262,7 @@ class Rebuildd:
         job.arch = arch
         job.mailto = mailto
 
-        self.log.info("Added job for %s_%s on %s/%s for %s" \
+        RebuilddLog().info("Added job for %s_%s on %s/%s for %s" \
                       % (name, version, dist, arch, mailto))
         return True
 
@@ -293,7 +291,7 @@ class Rebuildd:
         return True
 
     def handle_sigterm(self, signum, stack):
-        self.log.info("Receiving transmission... it's a signal %s capt'ain! EVERYONE OUT!" % signum)
+        RebuilddLog().info("Receiving transmission... it's a signal %s capt'ain! EVERYONE OUT!" % signum)
         self.do_quit.set()
 
     def loop(self):
