@@ -45,10 +45,14 @@ class Job(threading.Thread, sqlobject.SQLObject):
     notify = None
 
     def __init__(self, *args, **kwargs):
+        """Init job"""
+
         threading.Thread.__init__(self)
         sqlobject.SQLObject.__init__(self, *args, **kwargs)
 
     def __setattr__(self, name, value):
+        """Override setattr to log build status changes"""
+
         if name == "build_status":
             RebuilddLog().info("Job %s for %s_%s on %s/%s changed status from %s to %s"\
                     % (self.id, self.package.name, self.package.version, 
@@ -58,6 +62,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
         sqlobject.SQLObject.__setattr__(self, name, value)
 
     def open_logfile(self, mode="r"):
+        """Open logfile and return file object"""
+
         build_log_file = "%s/%s_%s-%s-%s-%s.%s.log" % (RebuilddConfig().get('log', 'logs_dir'),
                                            self.package.name, self.package.version,
                                            self.dist, self.arch,
@@ -74,6 +80,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
         return build_log
 
     def preexec_child(self):
+        """Start a new group process before executing child"""
+
         os.setsid()
 
     def run(self):
@@ -94,6 +102,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
                     Dists().dists[self.dist].get_build_cmd(self.package),
                     Dists().dists[self.dist].get_post_build_cmd(self.package)):
+            if cmd is None:
+                continue
             try:
                 proc = subprocess.Popen(cmd.split(), bufsize=0,
                                                      preexec_fn=self.preexec_child,
