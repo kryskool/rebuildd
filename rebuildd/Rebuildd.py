@@ -34,7 +34,7 @@ import sqlobject
 
 __version__ = "$Rev$"
 
-class Rebuildd:
+class Rebuildd(object):
     jobs = []
     do_quit = threading.Event()
     jobs_locker = threading.Lock()
@@ -44,9 +44,10 @@ class Rebuildd:
     def __new__(cls):  
         if cls._instance is None:  
            cls._instance = object.__new__(cls)  
+           cls._instance.init()
         return cls._instance  
 
-    def __init__(self):
+    def init(self):
         self.cfg = RebuilddConfig()
 
         sqlobject.sqlhub.processConnection = \

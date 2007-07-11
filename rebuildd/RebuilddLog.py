@@ -19,7 +19,7 @@
 import logging
 from RebuilddConfig import RebuilddConfig
 
-class RebuilddLog:
+class RebuilddLog(object):
     """Singleton used for logging"""
 
     _instance = None
@@ -27,9 +27,10 @@ class RebuilddLog:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = object.__new__(cls)
+            cls._instance.init()
         return cls._instance
 
-    def __init__(self):
+    def init(self):
         self.cfg = RebuilddConfig()
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s %(message)s',

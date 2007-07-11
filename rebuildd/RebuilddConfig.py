@@ -19,20 +19,20 @@
 import ConfigParser
 import os
 
-class RebuilddConfig(ConfigParser.ConfigParser):
+class RebuilddConfig(object, ConfigParser.ConfigParser):
     """Main configuration singleton"""
 
     config_file = "/etc/rebuildd/rebuilddrc"
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = object.__new__(cls)
+            cls._instance.init(*args, **kwargs)
         return cls._instance
 
-    def __init__(self, dontparse=False):
+    def init(self, dontparse=False):
         ConfigParser.ConfigParser.__init__(self)
-
         # add default sections
         self.add_section('build')
         self.add_section('mail')
