@@ -135,6 +135,9 @@ class Job(threading.Thread, sqlobject.SQLObject):
             self.host = ""
 
             build_log.write("\nJob killed on request\n")
+            build_log.close()
+
+            return
 
         # build is finished
         with self.status_lock:
@@ -142,6 +145,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 self.build_status = JOBSTATUS.BUILD_OK
             else:
                 self.build_status = JOBSTATUS.BUILD_FAILED
+
         build_log.close()
 
         self.build_end = sqlobject.DateTimeCol.now()
