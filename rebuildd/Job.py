@@ -123,7 +123,10 @@ class Job(threading.Thread, sqlobject.SQLObject):
         if self.do_quit.isSet():
             # Kill gently the process
             RebuilddLog().info("Killing job %s with SIGINT" % self.id)
-            os.killpg(os.getpgid(proc.pid), signal.SIGINT)
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGINT)
+            except OSError, error:
+                RebuilddLog().error("Error killing job %s: %s" % (self.id, error))
 
             # If after 60s it's not dead, KILL HIM
             counter = 0
