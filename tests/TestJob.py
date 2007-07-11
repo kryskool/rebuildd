@@ -3,8 +3,8 @@ import sys
 
 sys.path.append("..")
 
-import unittest
-import os
+import unittest, types
+import os, copy
 import sqlobject
 from rebuildd.Rebuildd import Rebuildd
 from rebuildd.RebuilddConfig import RebuilddConfig
@@ -15,9 +15,11 @@ from rebuildd.Jobstatus import JOBSTATUS
 class TestJob(unittest.TestCase):
 
     def setUp(self):
-        RebuilddConfig(dontparse=True).set('log', 'logs_dir', '/tmp')
-        RebuilddConfig(dontparse=True).set('build', 'database_uri', 'sqlite:///tmp/rebuildd-tests.db')
+        RebuilddConfig(dontparse=True)
+        RebuilddConfig().set('log', 'logs_dir', '/tmp')
+        RebuilddConfig().set('build', 'database_uri', 'sqlite:///tmp/rebuildd-tests.db')
         RebuilddConfig().set('log', 'file', '/tmp/rebuildd-tests.log')
+        RebuilddConfig().set('log', 'mail', '0')
         try:
             os.unlink("/tmp/rebuildd-tests.db")
         except OSError:
@@ -29,6 +31,15 @@ class TestJob(unittest.TestCase):
         except:
             pass
         self.job = Job(package=Package(name="bash", version="3.1dfsg-8"), arch="alpha", dist="sid")
+
+    def test_init(self):
+        self.assert_(type(self.job) is Job)
+
+    def test_setattr(self):
+        self.job.build_status = JOBSTATUS.UNKNOWN
+        self.assert_(self.job.build_status == JOBSTATUS.UNKNOWN)
+        self.job.build_status = JOBSTATUS.WAIT
+        self.assert_(self.job.build_status == JOBSTATUS.WAIT)
 
     def test_open_logfile(self):
         file = self.job.open_logfile("w")
@@ -44,6 +55,51 @@ class TestJob(unittest.TestCase):
         self.job.start()
         self.job.join()
         self.assert_(self.job.build_status == JOBSTATUS.WAIT_LOCKED)
+
+    def test_build_success(self):
+        self.job.do_quit.clear()
+        RebuilddConfig().set('build', 'source_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
+        self.job.start()
+        self.job.join()
+        self.assert_(self.job.build_status == JOBSTATUS.OK)
+
+    def test_build_failure1(self):
+        self.job.do_quit.clear()
+        RebuilddConfig().set('build', 'source_cmd', '/bin/false %s %s %s')
+        RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
+        self.job.start()
+        self.job.join()
+        self.assert_(self.job.build_status == JOBSTATUS.FAILED)
+
+    def test_build_failure2(self):
+        self.job.do_quit.clear()
+        RebuilddConfig().set('build', 'source_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'build_cmd', '/bin/false %s %s %s')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
+        self.job.start()
+        self.job.join()
+        self.assert_(self.job.build_status == JOBSTATUS.FAILED)
+
+    def test_build_failure3(self):
+        RebuilddConfig().set('build', 'source_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/false %s %s %s')
+        self.job.start()
+        self.job.join()
+        self.assert_(self.job.build_status == JOBSTATUS.FAILED)
+
+    def test_send_build_log(self):
+        self.assert_(self.job.send_build_log() is False)
+        self.job.build_status = JOBSTATUS.BUILD_OK
+        self.assert_(self.job.send_build_log() is True)
+        self.assert_(self.job.build_status is JOBSTATUS.OK)
+        self.job.build_status = JOBSTATUS.BUILD_FAILED
+        self.assert_(self.job.send_build_log() is True)
+        self.assert_(self.job.build_status is JOBSTATUS.FAILED)
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestJob)
