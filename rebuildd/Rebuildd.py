@@ -26,7 +26,6 @@ from Dists import Dists
 from RebuilddLog import RebuilddLog
 from RebuilddConfig import RebuilddConfig
 from RebuilddNetworkServer import RebuilddNetworkServer
-from RebuilddHTTPServer import RebuilddHTTPServer
 from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
@@ -68,9 +67,6 @@ class Rebuildd:
         self.netserv = RebuilddNetworkServer(self)
         self.netserv.setDaemon(True)
         self.netserv.start()
-        self.httpd = RebuilddHTTPServer(self)
-        self.httpd.setDaemon(True)
-        self.httpd.start()
 
         # Run main loop
         self.log.info("Running main loop")
@@ -86,7 +82,6 @@ class Rebuildd:
         self.log.info("Releasing wait-locked jobs")
         self.release_jobs()
         self.netserv.join(10)
-        self.httpd.join(10)
         self.log.info("Exiting rebuildd")
 
     def daemonize(self):

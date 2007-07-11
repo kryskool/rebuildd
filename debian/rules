@@ -13,7 +13,7 @@ install/rebuildd::
 	install -d debian/rebuildd/usr/sbin
 	install -m 0755 rebuildd.py debian/rebuildd/usr/sbin/rebuildd
 	sed -i "s,^__version__.*$=,__version__ = \"$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)\"," debian/rebuildd/usr/lib/python2.5/site-packages/rebuildd/*.py
-
+	dh_installinit --name=rebuildd-httpd
 
 cleanbuilddir/rebuildd::
 	rm -f rebuildd.1

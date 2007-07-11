@@ -17,6 +17,9 @@
 #
 
 from RebuilddConfig import RebuilddConfig
+from Rebuildd import Rebuildd
+from Package import Package
+from Job import Job
 
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -31,19 +34,30 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
         """GET method"""
 
         try:
-            if self.path == "/":
-                self.send_index()
-                return
-            if self.path[1:].startswith("job_"):
-                index = self.path.rindex('_') + 1
-                self.send_job(int(self.path[index:]))
-                return
-            if self.path[1:].startswith("host_"):
-                index = self.path.rindex('_') + 1
-                self.send_index(host=self.path[index:])
-                return
+            d = {}
+            for kwd in ( "job", "host", "arch", "dist"):
+                try:
+                    index_kwd = self.path.index(kwd)
+                except ValueError:
+                    continue
+
+                index_start = index_kwd + len(kwd) + 1
+                try:
+                    index_end = self.path.index("/", index_kwd)
+                except ValueError:
+                    index_end = None
+                
+                if kwd == "job":
+                    self.send_job(int(self.path[index_start:index_end]))
+                    return
+                else:
+                    d[kwd] = self.path[index_start:index_end]
+
+            self.send_index(**d)
+
+            return
         except Exception, error:
-            self.send_error(500, error)
+            self.send_error(500, error.__str__())
 
         self.send_error(404, "Document not found :-(")
 
@@ -55,7 +69,8 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
     def send_job(self, jobid):
         tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
                        + "/job.tpl")
-        job = RebuilddHTTPServer.http_rebuildd.get_all_jobs(id=jobid)
+        job = []
+        job.extend(Job.selectBy(id=jobid))
         if len(job):
             job = job[0]
             build_log = job.open_logfile("r")
@@ -75,30 +90,26 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
         self.send_hdrs()
         tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
                        + "/index.tpl")
+        jobs = []
+        jobs.extend(Job.selectBy(**kwargs))
         self.wfile.write(tpl.render(host=socket.getfqdn(), \
-                                    jobs=RebuilddHTTPServer.http_rebuildd.get_all_jobs(**kwargs)))
+                                    jobs=jobs))
 
 
 class RebuilddHTTPServer(threading.Thread, HTTPServer):
     """Main HTTP server"""
 
-    def __init__(self, rebuildd):
+    def __init__(self):
         threading.Thread.__init__(self)
         HTTPServer.__init__(self,
                             (RebuilddConfig().get('http', 'ip'),
                              RebuilddConfig().getint('http', 'port')),
                             RebuilddHTTPHandler)
-        self.rebuildd = rebuildd
-        RebuilddHTTPServer.http_rebuildd = rebuildd
+        Rebuildd()
 
     def run(self):
 
         """Run main HTTP server thread"""
         
-        httpsocket = socket.fromfd(self.fileno(), socket.AF_INET, socket.SOCK_STREAM)
-        httpsocket.settimeout(0.1)
-
-        while not self.rebuildd.do_quit.isSet():
-            self.handle_request()
-            self.rebuildd.do_quit.wait(0.1)
+        self.serve_forever()
 

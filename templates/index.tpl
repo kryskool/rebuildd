@@ -21,10 +21,10 @@
       % for job in jobs:
         <tr>
           <td><a href="/job_${job.id}">${job.id}</a></td>
-          <td>${job.package.name}</td>
-          <td>${job.package.version}</td>
-          <td>${job.dist}</td>
-          <td>${job.arch}</td>
+          <td><a href="/package_${job.package.name}">${job.package.name}</a></td>
+          <td><a href="/package_${job.package.name}/version_${job.package.version}">${job.package.version}</a></td>
+          <td><a href="/dist_${job.dist}">${job.dist}</a></td>
+          <td><a href="/arch_${job.arch}">${job.arch}</a></td>
           <td>${job.creation_date}</td>
           <td>${job.mailto}</td>
           % if job.build_status == 0:

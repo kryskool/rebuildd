@@ -2,22 +2,22 @@
 # rebuildd init script
 #
 ### BEGIN INIT INFO
-# Provides:          rebuildd
+# Provides:          rebuildd-httpd
 # Required-Start:
 # Required-Stop:
 # Should-Start:      $local_fs $network
 # Should-Stop:       $local_fs $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: rebuild daemon
-# Description:       daemon providing rebuild system
-#                    for Debian packages
+# Short-Description: rebuild daemon Web server
+# Description:       daemon providing Web interface to
+#                    rebuild system for Debian packages
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/sbin/rebuildd
-NAME=rebuildd
-DESC="rebuild daemon"
+DAEMON=/usr/sbin/rebuildd-httpd
+NAME=rebuildd-httpd
+DESC="rebuild daemon HTTP server"
 
 test -x $DAEMON || exit 0
 
@@ -26,7 +26,7 @@ if [ -f /etc/default/rebuildd ] ; then
 	. /etc/default/rebuildd
 fi
 
-test "$START_REBUILDD" = 1 || exit 0
+test "$START_REBUILDD_HTTPD" = 1 || exit 0
 
 set -e
 
@@ -39,7 +39,7 @@ case "$1" in
 	;;
   stop)
 	echo -n "Stopping $DESC: "
-	start-stop-daemon --stop --quiet --oknodo --retry 120 --pidfile /var/run/$NAME.pid
+	start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/$NAME.pid
 	echo "$NAME."
 	;;
   #reload)
