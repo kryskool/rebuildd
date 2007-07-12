@@ -38,9 +38,16 @@ class TestRebuildd(unittest.TestCase):
         ret = self.r.release_jobs()
         self.assert_(ret is True)
 
+    def test_get_job(self):
+        self.r.add_job(name="glibc", version="2.6-3", dist="sid")
+        pkg = Package.selectBy(name="glibc", version="2.6-3")[0]
+        job = Job.selectBy(package=pkg)[0]
+        self.r.get_new_jobs()
+        self.assert_(self.r.get_job(job.id) is job)
+
     def test_get_new_jobs(self):
         self.r.add_job(name="xpdf", version="3.02-1", dist="lenny")
-        self.assert_(self.r.get_new_jobs() is 1)
+        self.assert_(self.r.get_new_jobs() >= 1)
 
     def test_cancel_job(self):
         self.r.add_job(name="glibc", version="2.6-2", dist="sid")
