@@ -16,7 +16,8 @@ class TestDistribution(unittest.TestCase):
     def setUp(self):
         rebuildd_global_test_setup()
         self.d = Distribution("sid")
-        self.package = Package(name="zsh", version="4.3.4-10")
+        self.package = Package(name="xutils", version="7.1.ds.3-1")
+        self.package_dotted = Package(name="xutils", version="1:7.1.ds.3-1")
 
     def test_name(self):
         self.assert_(self.d.name is "sid")
@@ -32,6 +33,8 @@ class TestDistribution(unittest.TestCase):
         self.assert_(self.d.name in cmd)
         self.assert_(self.package.name in cmd)
         self.assert_(self.package.version in cmd)
+        cmd = self.d.get_build_cmd(self.package_dotted)
+        self.assert_(self.package_dotted.version not in cmd)
 
     def test_get_post_build_cmd(self):
         RebuilddConfig().set('build', 'post_build_cmd', '')
