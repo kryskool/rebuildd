@@ -35,9 +35,9 @@ class Distribution(object):
 
         # Strip epochs (x:) away
         try:
-            index = RebuilddConfig().get('build', 'build_cmd').index(":")
-            return RebuilddConfig().get('build', 'build_cmd')[index+1:] \
-                    % (self.name, package.name, package.version)
+            index = package.version.index(":")
+            return RebuilddConfig().get('build', 'build_cmd') \
+                    % (self.name, package.name, package.version[index+1:])
         except ValueError:
             pass
 
