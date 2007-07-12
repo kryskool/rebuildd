@@ -3,11 +3,9 @@ import sys
   
 sys.path.insert(0, "..")  
 sys.path.insert(0, ".")  
-
-import unittest, types
-import os, copy
+from RebuilddTestSetup import rebuildd_global_test_setup
+import unittest, types, os
 import sqlobject
-from rebuildd.Rebuildd import Rebuildd
 from rebuildd.RebuilddConfig import RebuilddConfig
 from rebuildd.Package import Package
 from rebuildd.Job import Job
@@ -16,21 +14,7 @@ from rebuildd.Jobstatus import JOBSTATUS
 class TestJob(unittest.TestCase):
 
     def setUp(self):
-        RebuilddConfig(dontparse=True)
-        RebuilddConfig().set('log', 'logs_dir', '/tmp')
-        RebuilddConfig().set('build', 'database_uri', 'sqlite:///tmp/rebuildd-tests.db')
-        RebuilddConfig().set('log', 'file', '/tmp/rebuildd-tests.log')
-        RebuilddConfig().set('log', 'mail', '0')
-        try:
-            os.unlink("/tmp/rebuildd-tests.db")
-        except OSError:
-            pass
-        Rebuildd()
-        try:
-            Package.createTable()
-            Job.createTable()
-        except:
-            pass
+        rebuildd_global_test_setup()
         self.job = Job(package=Package(name="bash", version="3.1dfsg-8"), arch="alpha", dist="sid")
 
     def test_init(self):
