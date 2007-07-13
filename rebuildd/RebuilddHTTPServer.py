@@ -57,7 +57,10 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
 
             return
         except Exception, error:
-            self.send_error(500, error.__str__())
+            try:
+                self.send_error(500, error.__str__())
+            except:
+                pass
             return
 
         self.send_error(404, "Document not found :-(")
@@ -85,7 +88,10 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
             self.send_hdrs()
             self.wfile.write(tpl.render(job=job, log=log))
         else:
-            self.send_error(500, "No such job %s" % jobid)
+            try:
+                self.send_error(500, "No such job %s" % jobid)
+            except:
+                pass
 
     def send_index(self, **kwargs):
         self.send_hdrs()
