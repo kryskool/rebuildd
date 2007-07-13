@@ -225,13 +225,14 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 smtp.sendmail(RebuilddConfig().get('mail', 'from'),
                               RebuilddConfig().get('mail', 'mailto'),
                               msg.as_string())
-            with self.status_lock:
-                if self.build_status == JOBSTATUS.BUILD_OK:
-                    self.build_status = JOBSTATUS.OK
-                if self.build_status == JOBSTATUS.BUILD_FAILED:
-                    self.build_status = JOBSTATUS.FAILED
         except Exception, error:
             RebuilddLog().error("Unable to send build log mail for job %s: %s" % (self.id, error))
-            return False
+
+        with self.status_lock:
+
+            if self.build_status == JOBSTATUS.BUILD_OK:
+                self.build_status = JOBSTATUS.OK
+            if self.build_status == JOBSTATUS.BUILD_FAILED:
+                self.build_status = JOBSTATUS.FAILED
 
         return True
