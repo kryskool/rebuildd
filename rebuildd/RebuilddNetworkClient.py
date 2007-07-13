@@ -181,4 +181,4 @@ class RebuilddNetworkClient(threading.Thread):
     def exec_cmd_job_reload(self, *args):
         """Load new jobs"""
 
-        return "I: %s new jobs added\n" % self.rebuildd.read_new_jobs()
+        return "I: %s new jobs added\n" % self.rebuildd.get_new_jobs()
