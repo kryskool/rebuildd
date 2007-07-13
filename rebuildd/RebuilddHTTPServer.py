@@ -58,6 +58,7 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
             return
         except Exception, error:
             self.send_error(500, error.__str__())
+            return
 
         self.send_error(404, "Document not found :-(")
 
