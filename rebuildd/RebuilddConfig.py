@@ -76,7 +76,6 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
 
         if not dontparse:
             self.reload()
-        self.save()
 
     def reload(self):
         """Reload configuration file"""
