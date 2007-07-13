@@ -19,5 +19,12 @@
 #
 
 from rebuildd.RebuilddHTTPServer import RebuilddHTTPServer
+from rebuildd.RebuilddConfig import RebuilddConfig
+import sys
+
+try:
+    sys.stdout = sys.stderr = file(RebuilddConfig().get('http', 'logfile'), "a")
+except Exception, error:
+    print "E: cannot open logfile: %s" % error
 
 RebuilddHTTPServer().start()

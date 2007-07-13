@@ -64,6 +64,7 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         # This is dedicated to MadCoder
         self.set('http', 'log_lines_nb', '30')
         self.set('http', 'templates_dir', '/usr/share/rebuildd/templates')
+        self.set('http', 'logfile', '/var/log/rebuildd/httpd.log')
 
         self.set('log', 'file', "/var/log/rebuildd/rebuildd.log")
         self.set('log', 'time_format', "%d-%m-%Y %H:%M:%S")
