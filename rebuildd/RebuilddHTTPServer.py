@@ -20,12 +20,14 @@ from RebuilddConfig import RebuilddConfig
 from Rebuildd import Rebuildd
 from Package import Package
 from Job import Job
+from Jobstatus import JOBSTATUS
 
 from BaseHTTPServer import HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from mako.template import Template
 
-import threading, socket
+import threading, socket, tempfile
+import gdchart
 
 class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
     """Class used for handling HTTP resquest"""
@@ -33,6 +35,9 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         """GET method"""
 
+        if self.path == "/build_stats.jpg":
+            self.send_build_stats()
+            return
         try:
             d = {}
             for kwd in ( "job", "host", "arch", "dist"):
@@ -64,6 +69,49 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
             return
 
         self.send_error(404, "Document not found :-(")
+
+    def send_build_stats(self):
+        self.send_response(200, 'OK')
+        self.send_header('Content-type', 'image/jpeg')
+        self.end_headers()
+        x = gdchart.Bar3D()
+        x.width = 250
+        x.height = 250
+        x.xtitle = "Build status"
+        x.ytitle = "Percentage"
+        x.title = "rebuildd jobs build status"
+        x.ext_color = [ "yellow", "orange", "red", "green"]
+        x.bg_color = "white"
+
+        j = 0
+        jw = 0
+        jb = 0
+        jf = 0
+        jo = 0
+        for job in Job.selectBy():
+            if job.build_status == JOBSTATUS.WAIT or \
+               job.build_status == JOBSTATUS.WAIT_LOCKED:
+                jw += 1
+            elif job.build_status == JOBSTATUS.BUILDING:
+                jb += 1
+            elif job.build_status == JOBSTATUS.BUILD_FAILED or \
+                 job.build_status == JOBSTATUS.FAILED:
+                jf += 1
+            elif job.build_status == JOBSTATUS.BUILD_OK or \
+                 job.build_status == JOBSTATUS.OK:
+                jo += 1
+            j += 1
+
+        x.setData([jw * 100 / j, jb * 100 / j, jf * 100 / j, jo * 100 / j])
+        x.setLabels(["WAIT", "BUILDING", "FAILED", "OK"])
+        tmp = tempfile.TemporaryFile()
+        x.draw(tmp)
+        tmp.seek(0)
+        i = tmp.read(1024)
+        while i:
+            self.wfile.write(i)
+            i = tmp.read(1024)
+        return
 
     def send_hdrs(self):
         self.send_response(200, 'OK')

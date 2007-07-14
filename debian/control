@@ -9,7 +9,7 @@ Package: rebuildd
 Architecture: all
 Suggests: cowdancer
 Recommends: pbuilder
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, python-mako, python-sqlobject
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, python-mako, python-sqlobject, python-gdchart2
 Description: build daemon aiming at rebuilding Debian packages
  This software allows you to manage a set of jobs. Each job is a package
  rebuilding task. Rebuilding is done by pbuilder (or cowbuilder if you want),

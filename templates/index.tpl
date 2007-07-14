@@ -4,6 +4,7 @@
   </head>
   <body>
     <h2>rebuildd status on ${host}</h2>
+      <table><tr><td>
       <table>
         <tr>
           <th>Id</th>
@@ -60,6 +61,6 @@
           </td>
         </tr>
       % endfor
-      </table>
+      </table></td><td><img src="/build_stats.jpg"></td></tr></table>
   </body>
 </html>
