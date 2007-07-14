@@ -78,12 +78,11 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
         x.width = 250
         x.height = 250
         x.xtitle = "Build status"
-        x.ytitle = "Percentage"
+        x.ytitle = "Jobs"
         x.title = "rebuildd jobs build status"
         x.ext_color = [ "yellow", "orange", "red", "green"]
         x.bg_color = "white"
 
-        j = 0
         jw = 0
         jb = 0
         jf = 0
@@ -100,9 +99,8 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
             elif job.build_status == JOBSTATUS.BUILD_OK or \
                  job.build_status == JOBSTATUS.OK:
                 jo += 1
-            j += 1
 
-        x.setData([jw * 100 / j, jb * 100 / j, jf * 100 / j, jo * 100 / j])
+        x.setData([jw, jb, jf, jo])
         x.setLabels(["WAIT", "BUILDING", "FAILED", "OK"])
         tmp = tempfile.TemporaryFile()
         x.draw(tmp)
