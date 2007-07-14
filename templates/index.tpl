@@ -61,6 +61,6 @@
           </td>
         </tr>
       % endfor
-      </table></td><td><img src="/build_stats.jpg"></td></tr></table>
+      </table></td><td valign="top"><img src="/build_stats.jpg"></td></tr></table>
   </body>
 </html>
