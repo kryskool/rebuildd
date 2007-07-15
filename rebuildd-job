@@ -88,6 +88,54 @@ def list():
     if critname == "id":
         print_jobs(Job.selectBy(id=critvalue))
 
+def stats():
+    jobs = Job.selectBy()
+    wait = 0
+    building = 0
+    ok = 0
+    failed = 0
+    nbjobs = jobs.count()
+    for job in jobs:
+        if job.build_status == JOBSTATUS.WAIT \
+           or job.build_status == JOBSTATUS.WAIT_LOCKED:
+            wait += 1
+        if job.build_status == JOBSTATUS.BUILDING:
+            building += 1
+        if job.build_status == JOBSTATUS.BUILD_OK \
+           or job.build_status == JOBSTATUS.OK:
+            ok += 1
+        if job.build_status == JOBSTATUS.BUILD_FAILED \
+           or job.build_status == JOBSTATUS.FAILED:
+            failed += 1
+
+    wait *= 10.0 / nbjobs
+    building *= 10.0 / nbjobs
+    failed *= 10.0 / nbjobs
+    ok *= 10.0 / nbjobs
+
+    lines = 10
+    while lines > 0:
+        print "[;1m%3.0d %% |" % (lines * 10),
+        if int(round(wait)) >= lines:
+            print " [34;1m##0 ",
+        else:
+            print "    ",
+        if int(round(building)) >= lines:
+            print " [35;1m##0 ",
+        else:
+            print "    ",
+        if int(round(failed)) >= lines:
+            print " [31;1m##0 ",
+        else:
+            print "    ",
+        if int(round(ok)) >= lines:
+            print " [32;1m##0 ",
+        else:
+            print "    ",
+        print "[0m"
+        lines -= 1
+    print "[;1m      +----------------------"
+    print "         WA   BU   FA   OK[0m"
 
 def print_headers():
     print "  id  |     package name     |    version     |    status    |  dist  |  arch  "
@@ -111,5 +159,7 @@ if len(sys.argv) > 1:
         add()
     if sys.argv[1] == "list":
         list()
+    if sys.argv[1] == "stats":
+        stats()
 else:
     usage()
