@@ -69,7 +69,8 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('log', 'file', "/var/log/rebuildd/rebuildd.log")
         self.set('log', 'time_format', "%d-%m-%Y %H:%M:%S")
         self.set('log', 'logs_dir', "/var/log/rebuildd/build_logs")
-        self.set('log', 'mail', '1')
+        self.set('log', 'mail_failed', '1')
+        self.set('log', 'mail_successful', '0')
 
         parch = os.popen("dpkg --print-architecture")
         self.arch = parch.readline().strip()
