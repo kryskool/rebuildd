@@ -8,6 +8,7 @@ rebuildd (0.2.0) UNRELEASED; urgency=low
   * Move http server outside, and standalone
   * Add a bunch of filter possibility on Web interface
   * Create unit tests
+  * Init scripts now use LSB
 
  -- Julien Danjou <acid@debian.org>  Tue, 10 Jul 2007 10:36:33 +0200
 

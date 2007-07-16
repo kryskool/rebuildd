@@ -28,19 +28,21 @@ fi
 
 test "$START_REBUILDD" = 1 || exit 0
 
+. /lib/lsb/init-functions
+
 set -e
 
 case "$1" in
   start)
-	echo -n "Starting $DESC: "
+	log_daemon_msg "Starting $DESC: " "$NAME"
 	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
 		--background --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
-	echo "$NAME."
+        log_end_msg $?
 	;;
   stop)
-	echo -n "Stopping $DESC: "
+	log_daemon_msg "Stopping $DESC: " "$NAME"
 	start-stop-daemon --stop --quiet --oknodo --retry 120 --pidfile /var/run/$NAME.pid
-	echo "$NAME."
+	log_end_msg $?
 	;;
   #reload)
 	#
@@ -67,13 +69,13 @@ case "$1" in
 	|| exit 0
 	;;
   restart)
-    echo -n "Restarting $DESC: "
+	log_daemon_msg "Restarting $DESC: " "$NAME"
 	start-stop-daemon --stop --quiet --pidfile \
 		/var/run/$NAME.pid --exec $DAEMON
 	sleep 1
 	start-stop-daemon --start --quiet --pidfile \
 		/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS
-	echo "$NAME."
+	log_end_msg $?
 	;;
   *)
 	N=/etc/init.d/$NAME
