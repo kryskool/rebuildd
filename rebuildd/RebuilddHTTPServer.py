@@ -22,72 +22,58 @@ from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
 
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from mako.template import Template
-
-import threading, socket, tempfile
+import tempfile
+import web
 import gdchart
 
-class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
-    """Class used for handling HTTP resquest"""
+render = web.template.render(RebuilddConfig().get('http', 'templates_dir'), \
+         cache=RebuilddConfig().getboolean('http', 'cache'))
 
-    def do_GET(self):
-        """GET method"""
+class RequestIndex:
 
-        if self.path == "/build_stats.jpg":
-            self.send_build_stats()
-            return
-        try:
-            d = {}
-            for kwd in ( "job", "host", "arch", "dist"):
-                try:
-                    index_kwd = self.path.index(kwd)
-                except ValueError:
-                    continue
+    def GET(self):
+        print render.base(page=render.index(), title="rebuildd")
 
-                index_start = index_kwd + len(kwd) + 1
-                try:
-                    index_end = self.path.index("/", index_kwd)
-                except ValueError:
-                    index_end = None
-                
-                if kwd == "job":
-                    self.send_job(int(self.path[index_start:index_end]))
-                    return
-                else:
-                    d[kwd] = self.path[index_start:index_end]
+class RequestDist:
 
-            self.send_index(**d)
+    def GET(self, dist=None):
+        print render.base(page=render.dist())
 
-            return
-        except Exception, error:
-            try:
-                self.send_error(500, error.__str__())
-            except:
-                pass
-            return
+class RequestArch:
 
-        self.send_error(404, "Document not found :-(")
+    def GET(self, dist, arch=None):
+        print render.base(page=render.arch())
 
-    def send_build_stats(self):
-        self.send_response(200, 'OK')
-        self.send_header('Content-type', 'image/jpeg')
-        self.end_headers()
-        x = gdchart.Bar3D()
-        x.width = 250
-        x.height = 250
-        x.xtitle = "Build status"
-        x.ytitle = "Jobs"
-        x.title = "rebuildd jobs build status"
-        x.ext_color = [ "yellow", "orange", "red", "green"]
-        x.bg_color = "white"
+class RequestJob:
+
+    def GET(self, jobid=None):
+        print render.base(page=render.job())
+
+class RequestGraph:
+
+    GET = web.autodelegate("GET_")
+
+    def GET_buildstats(self, arch=None):
+        web.header("Content-Type","image/png") 
+        graph = gdchart.Bar3D()
+        graph.width = 300
+        graph.height = 300
+        graph.ytitle = "Jobs"
+        graph.xtitle = "Build status"
+        graph.ext_color = [ "yellow", "orange", "red", "green"]
+        graph.bg_color = "white"
+        if arch == "/":
+            graph.title = "Build status"
+            jobs = Job.selectBy()
+        else:
+            graph.title = "Build status for %s" % arch[1:]
+            jobs = Job.selectBy(arch=arch[1:])
 
         jw = 0
         jb = 0
         jf = 0
         jo = 0
-        for job in Job.selectBy():
+        for job in jobs:
             if job.build_status == JOBSTATUS.WAIT or \
                job.build_status == JOBSTATUS.WAIT_LOCKED:
                 jw += 1
@@ -100,69 +86,32 @@ class RebuilddHTTPHandler(SimpleHTTPRequestHandler):
                  job.build_status == JOBSTATUS.OK:
                 jo += 1
 
-        x.setData([jw, jb, jf, jo])
-        x.setLabels(["WAIT", "BUILDING", "FAILED", "OK"])
+        graph.setData([jw, jb, jf, jo])
+        graph.setLabels(["WAIT", "BUILDING", "FAILED", "OK"])
         tmp = tempfile.TemporaryFile()
-        x.draw(tmp)
+        graph.draw(tmp)
         tmp.seek(0)
-        i = tmp.read(1024)
-        while i:
-            self.wfile.write(i)
-            i = tmp.read(1024)
-        return
+        print tmp.read()
 
-    def send_hdrs(self):
-        self.send_response(200, 'OK')
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-
-    def send_job(self, jobid):
-        tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
-                       + "/job.tpl")
-        job = []
-        job.extend(Job.selectBy(id=jobid))
-        if len(job):
-            job = job[0]
-            build_log = job.open_logfile("r")
-            if build_log:
-                log = ""
-                nblines = RebuilddConfig().getint('http', 'log_lines_nb')
-                for line in build_log.readlines()[-nblines:]:
-                    log += line
-            else:
-                log = "No build log available"
-            self.send_hdrs()
-            self.wfile.write(tpl.render(job=job, log=log))
-        else:
-            try:
-                self.send_error(500, "No such job %s" % jobid)
-            except:
-                pass
-
-    def send_index(self, **kwargs):
-        self.send_hdrs()
-        tpl = Template(filename=RebuilddConfig().get('http', 'templates_dir') \
-                       + "/index.tpl")
-        jobs = []
-        jobs.extend(Job.selectBy(**kwargs))
-        self.wfile.write(tpl.render(host=socket.getfqdn(), \
-                                    jobs=jobs))
-
-
-class RebuilddHTTPServer(threading.Thread, HTTPServer):
+class RebuilddHTTPServer:
     """Main HTTP server"""
 
+    urls = (
+            '/', 'RequestIndex',
+            '/dist/(.*)', 'RequestDist',
+            '/dist/(.*)/arch/(.*)', 'RequestArch',
+            '/job/(.*)', 'RequestJob',
+            '/graph/(.*)', 'RequestGraph',
+            )
+
     def __init__(self):
-        threading.Thread.__init__(self)
-        HTTPServer.__init__(self,
-                            (RebuilddConfig().get('http', 'ip'),
-                             RebuilddConfig().getint('http', 'port')),
-                            RebuilddHTTPHandler)
         Rebuildd()
 
-    def run(self):
+    def start(self):
 
         """Run main HTTP server thread"""
-        
-        self.serve_forever()
 
+        web.webapi.internalerror = web.debugerror
+        web.httpserver.runsimple(web.webapi.wsgifunc(web.webpyfunc(self.urls, globals(), False)),
+                                 (RebuilddConfig().get('http', 'ip'),
+                                  RebuilddConfig().getint('http', 'port')))
