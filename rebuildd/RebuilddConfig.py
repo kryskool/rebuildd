@@ -48,6 +48,7 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/%s.tgz %s_%s.dsc')
         self.set('build', 'post_build_cmd', '')
         self.set('build', 'dists', 'etch lenny sid')
+        self.set('build', 'archs', 'i386 all')
         self.set('build', 'work_dir', '/var/cache/rebuildd/build')
         self.set('build', 'database_uri', 'sqlite:///var/lib/rebuildd/rebuildd.db')
 

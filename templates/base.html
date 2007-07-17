@@ -1,11 +1,37 @@
-$def with (page, title=None)
-<html><head>
-    <title>my site\
-$if title: : $title\
+$def with (page, title=None, hostname="a yellow submarine", dists, archs, dist=None, arch=None, package=None)
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="/static/rebuildd.css" rel="stylesheet" type="text/css" />
+    <title>rebuildd\
+$if title: - $title\
 </title>
-</head><body>
-<h1><a href="/">rebuildd</a></h1>
+  </head>
+  <body>
+    <div id="graph">
+$if dist and arch:
+    <img src="/graph/buildstats/$dist/$arch" />
+$elif package:
+    <img src="/graph/package/$package" />
+$else:
+    <img src="/graph/buildstats/" />
+</div>
+    <h1>rebuildd on $hostname</h1>
+
+$if title:
+    <h2>Status for $title</h2>
+
+    <div id="links">
+$for d in dists:
+    $for a in archs:
+        <a href="/dist/$d/arch/$a">[ $d/$a ]</a>
+      
+</div>
+    <div id="content">
 
 $:page
 
-</body></html>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+body
+{
+	font-size: 0.9em;
+	font-family: Helvetica, Verdana, Arial;
+}
+
+h1
+{
+	text-align: center;
+}
+
+h2
+{
+	text-align: center;
+        background-color: black;
+        color: white;
+        size: 0%;
+}
+
+#graph
+{
+	position: fixed;
+	top: 100px;
+	right: 10px;
+	width: 300px;
+	height: 300px;
+}
+
+#content
+{
+	margin-right: 300px;
+}
+
+table#list
+{
+	border-collapse: collapse;
+	margin: 0px;
+	padding: 0px;
+	border: 2px solid black;
+}
+
+table #list tr,th,td
+{
+	padding: 5px;
+	border: 1px solid black;
+}
+
+#links
+{
+	margin-bottom: 30px;
+	text-align: center;
+}

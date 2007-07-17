@@ -22,7 +22,7 @@ from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
 
-import tempfile
+import tempfile, socket
 import web
 import gdchart
 
@@ -32,28 +32,67 @@ render = web.template.render(RebuilddConfig().get('http', 'templates_dir'), \
 class RequestIndex:
 
     def GET(self):
-        print render.base(page=render.index(), title="rebuildd")
+        print render.base(page=render.index(), \
+                hostname=socket.gethostname(), \
+                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                dists=RebuilddConfig().get('build', 'dists').split(' '))
 
-class RequestDist:
+class RequestPackage:
 
-    def GET(self, dist=None):
-        print render.base(page=render.dist())
+    def GET(self, name=None, version=None):
+        jobs = []
+
+        if version:
+            pkg = Package.selectBy(name=name, version=version)[0]
+            title = "%s %s" % (name, version)
+            package = "%s/%s" % (name, version)
+        else:
+            pkg = Package.selectBy(name=name)[0]
+            title = package = name
+
+        jobs.extend(Job.selectBy(package=pkg))
+        print render.base(page=render.tab(jobs=jobs), \
+                hostname=socket.gethostname(), \
+                title=title, \
+                package=package, \
+                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestArch:
 
     def GET(self, dist, arch=None):
-        print render.base(page=render.arch())
+        jobs = []
+        jobs.extend(Job.selectBy(arch=arch, dist=dist))
+        print render.base(page=render.tab(jobs=jobs), \
+                arch=arch, \
+                dist=dist, \
+                title="%s/%s" % (dist, arch), \
+                hostname=socket.gethostname(), \
+                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestJob:
 
     def GET(self, jobid=None):
-        print render.base(page=render.job())
+        job = Job.selectBy(id=jobid)[0]
+        build_logfile = job.open_logfile()
+
+        if build_logfile:
+           build_log = build_log
+        else:
+            build_log = "No build log available"
+
+        print render.base(page=render.job(job=job, build_log=build_log), \
+                hostname=socket.gethostname(), \
+                title="job %s" % job.id, \
+                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestGraph:
 
     GET = web.autodelegate("GET_")
 
-    def GET_buildstats(self, arch=None):
+    def graph_init(self):
         web.header("Content-Type","image/png") 
         graph = gdchart.Bar3D()
         graph.width = 300
@@ -62,13 +101,11 @@ class RequestGraph:
         graph.xtitle = "Build status"
         graph.ext_color = [ "yellow", "orange", "red", "green"]
         graph.bg_color = "white"
-        if arch == "/":
-            graph.title = "Build status"
-            jobs = Job.selectBy()
-        else:
-            graph.title = "Build status for %s" % arch[1:]
-            jobs = Job.selectBy(arch=arch[1:])
+        graph.setLabels(["WAIT", "BUILDING", "FAILED", "OK"])
 
+        return graph
+
+    def compute_stats(self, jobs):
         jw = 0
         jb = 0
         jf = 0
@@ -86,8 +123,36 @@ class RequestGraph:
                  job.build_status == JOBSTATUS.OK:
                 jo += 1
 
-        graph.setData([jw, jb, jf, jo])
-        graph.setLabels(["WAIT", "BUILDING", "FAILED", "OK"])
+        return (jw, jb, jf, jo)
+
+    def GET_buildstats(self, distarch=None):
+        graph = self.graph_init()
+        if distarch == "/":
+            graph.title = "Build status"
+            jobs = Job.selectBy()
+        else:
+            dindex = distarch.rindex("/")
+            graph.title = "Build status for %s" % distarch[1:]
+            jobs = Job.selectBy(arch=distarch[dindex+1:], dist=distarch[1:dindex])
+
+        graph.setData(self.compute_stats(jobs))
+        tmp = tempfile.TemporaryFile()
+        graph.draw(tmp)
+        tmp.seek(0)
+        print tmp.read()
+
+    def GET_package(self, package=None):
+        graph = self.graph_init()
+        if package == "/":
+            graph.title = "Build status"
+            jobs = Job.selectBy()
+        else:
+            dindex = package.rindex("/")
+            graph.title = "Build status for %s" % package[1:]
+            pkg = Package.selectBy(version=package[dindex+1:], name=package[1:dindex])[0]
+            jobs = Job.selectBy(package=pkg)
+
+        graph.setData(self.compute_stats(jobs))
         tmp = tempfile.TemporaryFile()
         graph.draw(tmp)
         tmp.seek(0)
@@ -98,9 +163,10 @@ class RebuilddHTTPServer:
 
     urls = (
             '/', 'RequestIndex',
-            '/dist/(.*)', 'RequestDist',
             '/dist/(.*)/arch/(.*)', 'RequestArch',
             '/job/(.*)', 'RequestJob',
+            '/package/(.*)/(.*)', 'RequestPackage',
+            '/package/(.*)', 'RequestPackage',
             '/graph/(.*)', 'RequestGraph',
             )
 

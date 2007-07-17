@@ -9,6 +9,8 @@ rebuildd (0.2.0) UNRELEASED; urgency=low
   * Create unit tests
   * Init scripts now use LSB
   * Rewrite Web server and interface with web.py
+    With new templates, thanks Clément Danjou (my little bro)
+    for them. :-) I still suck with HTML.
 
  -- Julien Danjou <acid@debian.org>  Tue, 10 Jul 2007 10:36:33 +0200
 

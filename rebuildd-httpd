@@ -20,11 +20,17 @@
 
 from rebuildd.RebuilddHTTPServer import RebuilddHTTPServer
 from rebuildd.RebuilddConfig import RebuilddConfig
-import sys
+import sys, os
 
 try:
     sys.stdout = sys.stderr = file(RebuilddConfig().get('http', 'logfile'), "a")
 except Exception, error:
     print "E: cannot open logfile: %s" % error
+
+try:
+    os.chdir(RebuilddConfig().get('http', 'templates_dir'))
+except Exception, error:
+    print "E: cannot chdir to templates_dir: %s" % error
+    sys.exit(1)
 
 RebuilddHTTPServer().start()
