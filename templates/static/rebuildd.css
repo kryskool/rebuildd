@@ -20,7 +20,7 @@ h2
 #graph
 {
 	position: fixed;
-	top: 100px;
+	top: 110px;
 	right: 10px;
 	width: 300px;
 	height: 300px;
@@ -28,7 +28,7 @@ h2
 
 #content
 {
-	margin-right: 300px;
+	margin-right: 330px;
 }
 
 table#list
