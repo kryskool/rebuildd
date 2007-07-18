@@ -22,7 +22,7 @@ from Package import Package
 from Job import Job
 from Jobstatus import JOBSTATUS
 
-import tempfile, socket
+import tempfile, socket, sqlobject
 import web
 import gdchart
 
@@ -62,7 +62,8 @@ class RequestArch:
 
     def GET(self, dist, arch=None):
         jobs = []
-        jobs.extend(Job.selectBy(arch=arch, dist=dist))
+        jobs.extend(Job.select(sqlobject.AND(Job.q.arch == arch, Job.q.dist == dist),
+            orderBy=sqlobject.DESC(Job.q.creation_date))[:10])
         print render.base(page=render.tab(jobs=jobs), \
                 arch=arch, \
                 dist=dist, \
@@ -78,7 +79,7 @@ class RequestJob:
         build_logfile = job.open_logfile()
 
         if build_logfile:
-           build_log = build_log
+            build_log = build_logfile.read()
         else:
             build_log = "No build log available"
 
