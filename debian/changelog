@@ -1,5 +1,6 @@
-rebuildd (0.2.0) UNRELEASED; urgency=low
+rebuildd (0.2.0) unstable; urgency=low
 
+  * Upload to Debian (Closes: #432302)
   * Stock builder hostname in job table
   * Add new max_jobs config var, used to load max_jobs new jobs
     This adds a new state WAIT_LOCKED for locking jobs handled by a build.
