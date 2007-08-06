@@ -96,7 +96,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
             self.build_status = JOBSTATUS.BUILDING
 
         self.build_start = sqlobject.DateTimeCol.now()
-        self.build_endt = None
 
         build_log.write("Automatic build of %s_%s on %s for %s/%s by rebuildd %s\n" % \
                          (self.package.name, self.package.version,
@@ -165,7 +164,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
         self.build_end = sqlobject.DateTimeCol.now()
 
         build_log.write("******************************************************************************\n")
-        build_log.write("Finished with status %s at \n" % (JOBSTATUS.whatis(self.build_status), self.build_end))
+        build_log.write("Finished with status %s at %s\n" % (JOBSTATUS.whatis(self.build_status), self.build_end))
         build_log.write("Build needed %s\n" % (self.build_start - self.build_end))
         build_log.close()
 
