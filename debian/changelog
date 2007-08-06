@@ -5,8 +5,9 @@ rebuildd (0.2.1) UNRELEASED; urgency=low
   * If a job is building, don't allow to add it
   * Rewrite rebuildd-job stats function with SQL,
     very very very very very very very very faster
+  * Add headers and footers to build logs
 
- -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 21:53:04 +0200
+ -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 22:16:01 +0200
 
 rebuildd (0.2.0) unstable; urgency=low
 

@@ -98,6 +98,12 @@ class Job(threading.Thread, sqlobject.SQLObject):
         self.build_start = sqlobject.DateTimeCol.now()
         self.build_endt = None
 
+        build_log.write("Automatic build of %s_%s on %s for %s/%s by rebuildd %s\n" % \
+                         (self.package.name, self.package.version,
+                          self.host, self.dist, self.arch, __version__))
+        build_log.write("Build started at %s\n" % self.build_start)
+        build_log.write("******************************************************************************\n")
+
         # download package for our dist
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
                     Dists().dists[self.dist].get_build_cmd(self.package),
@@ -144,7 +150,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
             # Reset host
             self.host = ""
 
-            build_log.write("\nJob killed on request\n")
+            build_log.write("\nBuild job killed on request\n")
             build_log.close()
 
             return
@@ -156,9 +162,13 @@ class Job(threading.Thread, sqlobject.SQLObject):
             else:
                 self.build_status = JOBSTATUS.BUILD_FAILED
 
+        self.build_end = sqlobject.DateTimeCol.now()
+
+        build_log.write("******************************************************************************\n")
+        build_log.write("Finished with status %s at \n" % (JOBSTATUS.whatis(self.build_status), self.build_end))
+        build_log.write("Build needed %s\n" % (self.build_start - self.build_end))
         build_log.close()
 
-        self.build_end = sqlobject.DateTimeCol.now()
 
         # Send event to Rebuildd to inform it that it can
         # run a brand new job!
