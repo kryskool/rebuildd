@@ -253,6 +253,7 @@ class Rebuildd(object):
         jobs = []
         jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT))
         jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT_LOCKED))
+        jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.BUILDING))
         if len(jobs):
             RebuilddLog().error("Job already existing for %s_%s on %s/%s, don't adding it" \
                            % (pkg.name, pkg.version, dist, arch))

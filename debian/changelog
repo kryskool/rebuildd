@@ -1,8 +1,9 @@
 rebuildd (0.2.1) UNRELEASED; urgency=low
 
   * Add --download-only to apt-get source by default
+  * If a job is building, don't allow to add it
 
- -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 14:05:36 +0200
+ -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 15:46:45 +0200
 
 rebuildd (0.2.0) unstable; urgency=low
 
