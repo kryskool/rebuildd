@@ -89,24 +89,14 @@ def list():
         print_jobs(Job.selectBy(id=critvalue))
 
 def stats():
-    jobs = Job.selectBy()
-    wait = 0
-    building = 0
-    ok = 0
-    failed = 0
-    nbjobs = jobs.count()
-    for job in jobs:
-        if job.build_status == JOBSTATUS.WAIT \
-           or job.build_status == JOBSTATUS.WAIT_LOCKED:
-            wait += 1
-        if job.build_status == JOBSTATUS.BUILDING:
-            building += 1
-        if job.build_status == JOBSTATUS.BUILD_OK \
-           or job.build_status == JOBSTATUS.OK:
-            ok += 1
-        if job.build_status == JOBSTATUS.BUILD_FAILED \
-           or job.build_status == JOBSTATUS.FAILED:
-            failed += 1
+    nbjobs = Job.selectBy().count()
+    wait = Job.selectBy(build_status=JOBSTATUS.WAIT).count()
+    wait += Job.selectBy(build_status=JOBSTATUS.WAIT_LOCKED).count()
+    building = Job.selectBy(build_status=JOBSTATUS.BUILDING).count()
+    ok = Job.selectBy(build_status=JOBSTATUS.OK).count()
+    ok += Job.selectBy(build_status=JOBSTATUS.BUILD_OK).count()
+    failed = Job.selectBy(build_status=JOBSTATUS.FAILED).count()
+    failed += Job.selectBy(build_status=JOBSTATUS.BUILD_FAILED).count()
 
     wait *= 10.0 / nbjobs
     building *= 10.0 / nbjobs

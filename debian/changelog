@@ -3,8 +3,10 @@ rebuildd (0.2.1) UNRELEASED; urgency=low
   * Add --download-only to apt-get source by default
     and put only one -q
   * If a job is building, don't allow to add it
+  * Rewrite rebuildd-job stats function with SQL,
+    very very very very very very very very faster
 
- -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 16:44:02 +0200
+ -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 21:53:04 +0200
 
 rebuildd (0.2.0) unstable; urgency=low
 
