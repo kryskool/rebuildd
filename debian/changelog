@@ -8,8 +8,9 @@ rebuildd (0.2.1) UNRELEASED; urgency=low
   * Add headers and footers to build logs
   * Dont't try to resend old mails, otherwise we send it
     twice sometimes.
+  * Fix a bug when database is empty in rebuildd-job stats
 
- -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 22:16:01 +0200
+ -- Julien Danjou <acid@debian.org>  Tue, 07 Aug 2007 15:14:36 +0200
 
 rebuildd (0.2.0) unstable; urgency=low
 

@@ -98,10 +98,16 @@ def stats():
     failed = Job.selectBy(build_status=JOBSTATUS.FAILED).count()
     failed += Job.selectBy(build_status=JOBSTATUS.BUILD_FAILED).count()
 
-    wait *= 10.0 / nbjobs
-    building *= 10.0 / nbjobs
-    failed *= 10.0 / nbjobs
-    ok *= 10.0 / nbjobs
+    if nbjobs > 0:
+        wait *= 10.0 / nbjobs
+        building *= 10.0 / nbjobs
+        failed *= 10.0 / nbjobs
+        ok *= 10.0 / nbjobs
+    else:
+        wait = 0.0
+        building = 0.0
+        failed = 0.0
+        ok = 0.0
 
     lines = 10
     while lines > 0:
