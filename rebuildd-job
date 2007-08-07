@@ -30,7 +30,7 @@ def usage():
     print "Usage: %s [command] <opts>\n" % os.path.basename(sys.argv[0])
     print "Commands:"
     print "   add                     - add jobs, reading from stdin"
-    print "   list <criteria> <value> - list jobs matching criteria"
+    print "   list <criteria>=<value> - list jobs matching criteria"
     sys.exit(1)
 
 def add():
