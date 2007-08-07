@@ -85,7 +85,6 @@ class TestJob(unittest.TestCase):
         self.assert_(self.job.send_build_log() is True)
         self.assert_(self.job.build_status is JOBSTATUS.FAILED)
 
-
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestJob)
     unittest.TextTestRunner(verbosity=2).run(suite)

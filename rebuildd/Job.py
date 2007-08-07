@@ -184,16 +184,19 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         if self.build_status != JOBSTATUS.BUILD_OK and \
            self.build_status != JOBSTATUS.BUILD_FAILED:
+            self.mail_lock.release()
             return False
 
         with self.status_lock:
             if not RebuilddConfig().getboolean('log', 'mail_successful') \
                and self.build_status == JOBSTATUS.BUILD_OK:
                 self.build_status = JOBSTATUS.OK
+                self.mail_lock.release()
                 return True
             elif not RebuilddConfig().getboolean('log', 'mail_failed') \
                  and self.build_status == JOBSTATUS.BUILD_FAILED:
                 self.build_status = JOBSTATUS.FAILED
+                self.mail_lock.release()
                 return True
 
         bstatus = "failed"
@@ -220,6 +223,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
         
         build_log = self.open_logfile("r")
         if not build_log:
+            self.mail_lock.release()
             return False
 
         log = ""
