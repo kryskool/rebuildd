@@ -32,13 +32,11 @@ class Job(threading.Thread, sqlobject.SQLObject):
     """Class implementing a build job"""
 
     build_status = sqlobject.IntCol(default=JOBSTATUS.UNKNOWN)
-    do_quit = threading.Event()
     mailto = sqlobject.StringCol(default=None)
     package = sqlobject.ForeignKey('Package')
     dist = sqlobject.StringCol(default='sid')
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
-    status_lock = threading.Lock()
     build_start = sqlobject.DateTimeCol(default=None)
     build_end = sqlobject.DateTimeCol(default=None)
     host = sqlobject.StringCol(default=None)
@@ -49,6 +47,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         threading.Thread.__init__(self)
         sqlobject.SQLObject.__init__(self, *args, **kwargs)
+        self.do_quit = threading.Event()
+        self.status_lock = threading.Lock()
 
     def __setattr__(self, name, value):
         """Override setattr to log build status changes"""

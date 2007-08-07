@@ -36,9 +36,6 @@ __version__ = "$Rev$"
 
 class Rebuildd(object):
     jobs = []
-    do_quit = threading.Event()
-    jobs_locker = threading.Lock()
-    job_finished = threading.Event()
     _instance = None 
          
     def __new__(cls):  
@@ -56,6 +53,10 @@ class Rebuildd(object):
         # Create distributions
         for dist in self.cfg.get('build', 'dists').split(' '):
             Dists().add_dist(Distribution(dist))
+
+        self.do_quit = threading.Event()
+        self.jobs_locker = threading.Lock()
+        self.job_finished = threading.Event()
 
     def daemon(self):
         RebuilddLog().info("Starting rebuildd %s" % __version__)
