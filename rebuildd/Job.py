@@ -39,7 +39,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
     status_lock = threading.Lock()
-    mail_lock = threading.Lock()
     build_start = sqlobject.DateTimeCol(default=None)
     build_end = sqlobject.DateTimeCol(default=None)
     host = sqlobject.StringCol(default=None)
@@ -185,72 +184,71 @@ class Job(threading.Thread, sqlobject.SQLObject):
     def send_build_log(self):
         """When job is built, send logs by mail"""
 
-        with self.mail_lock:
-            with self.status_lock:
-                if self.build_status != JOBSTATUS.BUILD_OK and \
-                    self.build_status != JOBSTATUS.BUILD_FAILED:
-                    return False
-
-                if not RebuilddConfig().getboolean('log', 'mail_successful') \
-                   and self.build_status == JOBSTATUS.BUILD_OK:
-                    self.build_status = JOBSTATUS.OK
-                    return True
-                elif not RebuilddConfig().getboolean('log', 'mail_failed') \
-                     and self.build_status == JOBSTATUS.BUILD_FAILED:
-                    self.build_status = JOBSTATUS.FAILED
-                    return True
-
-
-            if self.build_status == JOBSTATUS.BUILD_OK:
-                bstatus = "successful"
-            else:
-                bstatus = "failed"
-
-            msg = Message()
-            if self.mailto:
-                msg['To'] = self.mailto
-            else:
-                msg['To'] = RebuilddConfig().get('mail', 'mailto')
-            msg['From'] = RebuilddConfig().get('mail', 'from')
-            msg['Subject'] = RebuilddConfig().get('mail', 'subject_prefix') + \
-                                     " Log for %s build of %s_%s on %s/%s" % \
-                                     (bstatus,
-                                      self.package.name, 
-                                      self.package.version,
-                                      self.dist,
-                                      self.arch)
-            msg['X-Rebuildd-Version'] = __version__
-            msg['X-Rebuildd-Host'] = socket.getfqdn()
-
-        
-            build_log = self.open_logfile("r")
-            if not build_log:
+        with self.status_lock:
+            if self.build_status != JOBSTATUS.BUILD_OK and \
+                self.build_status != JOBSTATUS.BUILD_FAILED:
                 return False
 
-            log = ""
-            for line in build_log.readlines():
-                log += line
+            if not RebuilddConfig().getboolean('log', 'mail_successful') \
+               and self.build_status == JOBSTATUS.BUILD_OK:
+                self.build_status = JOBSTATUS.OK
+                return True
+            elif not RebuilddConfig().getboolean('log', 'mail_failed') \
+                 and self.build_status == JOBSTATUS.BUILD_FAILED:
+                self.build_status = JOBSTATUS.FAILED
+                return True
 
-            msg.set_payload(log)
 
-            try:
-                smtp = smtplib.SMTP()
-                smtp.connect()
-                if self.mailto:
-                    smtp.sendmail(RebuilddConfig().get('mail', 'from'),
-                                  self.mailto,
-                                  msg.as_string())
-                else:
-                    smtp.sendmail(RebuilddConfig().get('mail', 'from'),
-                                  RebuilddConfig().get('mail', 'mailto'),
-                                  msg.as_string())
-            except Exception, error:
-                RebuilddLog().error("Unable to send build log mail for job %s: %s" % (self.id, error))
+        if self.build_status == JOBSTATUS.BUILD_OK:
+            bstatus = "successful"
+        else:
+            bstatus = "failed"
 
-            with self.status_lock:
-                if self.build_status == JOBSTATUS.BUILD_OK:
-                    self.build_status = JOBSTATUS.OK
-                else:
-                    self.build_status = JOBSTATUS.FAILED
+        msg = Message()
+        if self.mailto:
+            msg['To'] = self.mailto
+        else:
+            msg['To'] = RebuilddConfig().get('mail', 'mailto')
+        msg['From'] = RebuilddConfig().get('mail', 'from')
+        msg['Subject'] = RebuilddConfig().get('mail', 'subject_prefix') + \
+                                 " Log for %s build of %s_%s on %s/%s" % \
+                                 (bstatus,
+                                  self.package.name, 
+                                  self.package.version,
+                                  self.dist,
+                                  self.arch)
+        msg['X-Rebuildd-Version'] = __version__
+        msg['X-Rebuildd-Host'] = socket.getfqdn()
+
+      
+        build_log = self.open_logfile("r")
+        if not build_log:
+            return False
+
+        log = ""
+        for line in build_log.readlines():
+            log += line
+
+        msg.set_payload(log)
+
+        try:
+            smtp = smtplib.SMTP()
+            smtp.connect()
+            if self.mailto:
+                smtp.sendmail(RebuilddConfig().get('mail', 'from'),
+                              self.mailto,
+                              msg.as_string())
+            else:
+                smtp.sendmail(RebuilddConfig().get('mail', 'from'),
+                              RebuilddConfig().get('mail', 'mailto'),
+                              msg.as_string())
+        except Exception, error:
+            RebuilddLog().error("Unable to send build log mail for job %s: %s" % (self.id, error))
+
+        with self.status_lock:
+            if self.build_status == JOBSTATUS.BUILD_OK:
+                self.build_status = JOBSTATUS.OK
+            else:
+                self.build_status = JOBSTATUS.FAILED
 
         return True

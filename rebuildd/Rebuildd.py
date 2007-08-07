@@ -306,8 +306,6 @@ class Rebuildd(object):
                 self.get_new_jobs()
                 # Start jobs
                 self.start_jobs()
-                # Try to resend build logs if failed
-                self.send_build_logs()
                 # Clean finished jobs
                 self.clean_jobs()
                 counter = 0
