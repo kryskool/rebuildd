@@ -6,6 +6,8 @@ rebuildd (0.2.1) UNRELEASED; urgency=low
   * Rewrite rebuildd-job stats function with SQL,
     very very very very very very very very faster
   * Add headers and footers to build logs
+  * Dont't try to resend old mails, otherwise we send it
+    twice sometimes.
 
  -- Julien Danjou <acid@debian.org>  Mon, 06 Aug 2007 22:16:01 +0200
 
