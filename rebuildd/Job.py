@@ -39,6 +39,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
     status_lock = threading.Lock()
+    mail_lock = threading.Lock()
     build_start = sqlobject.DateTimeCol(default=None)
     build_end = sqlobject.DateTimeCol(default=None)
     host = sqlobject.StringCol(default=None)
@@ -177,7 +178,9 @@ class Job(threading.Thread, sqlobject.SQLObject):
         self.send_build_log()
 
     def send_build_log(self):
-        """When job is BUILT, send logs by mail"""
+        """When job is built, send logs by mail"""
+
+        self.mail_lock.acquire()
 
         if self.build_status != JOBSTATUS.BUILD_OK and \
            self.build_status != JOBSTATUS.BUILD_FAILED:
@@ -245,5 +248,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 self.build_status = JOBSTATUS.OK
             if self.build_status == JOBSTATUS.BUILD_FAILED:
                 self.build_status = JOBSTATUS.FAILED
+
+        self.mail_lock.release()
 
         return True
