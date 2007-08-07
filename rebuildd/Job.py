@@ -103,6 +103,11 @@ class Job(threading.Thread, sqlobject.SQLObject):
                           self.host, self.dist, self.arch, __version__))
         build_log.write("Build started at %s\n" % self.build_start)
         build_log.write("******************************************************************************\n")
+        build_log.close()
+
+        build_log = self.open_logfile("a")
+        if not build_log:
+            return
 
         # execute commands
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
