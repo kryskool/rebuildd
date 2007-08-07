@@ -205,16 +205,16 @@ class Rebuildd(object):
         with self.jobs_locker:
             job = self.get_job(jobid)
             if job != None:
-                    if job.isAlive():
-                        job.do_quit.set()
-                        job.join()
-                    with job.status_lock:
-                        job.build_status = JOBSTATUS.CANCELED
-                    self.jobs.remove(job)
-                    RebuilddLog().info("Canceled job %s for %s_%s on %s/%s for %s" \
-                                    % (job.id, job.package.name, job.package.version,
-                                    job.dist, job.arch, job.mailto))
-                    return True
+                if job.isAlive():
+                    job.do_quit.set()
+                    job.join()
+                with job.status_lock:
+                    job.build_status = JOBSTATUS.CANCELED
+                self.jobs.remove(job)
+                RebuilddLog().info("Canceled job %s for %s_%s on %s/%s for %s" \
+                                % (job.id, job.package.name, job.package.version,
+                                job.dist, job.arch, job.mailto))
+                return True
 
         return False
 
