@@ -103,7 +103,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
         build_log.write("Build started at %s\n" % self.build_start)
         build_log.write("******************************************************************************\n")
 
-        # download package for our dist
+        # execute commands
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
                     Dists().dists[self.dist].get_build_cmd(self.package),
                     Dists().dists[self.dist].get_post_build_cmd(self.package)):
@@ -165,7 +165,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         build_log.write("******************************************************************************\n")
         build_log.write("Finished with status %s at %s\n" % (JOBSTATUS.whatis(self.build_status), self.build_end))
-        build_log.write("Build needed %s\n" % (self.build_start - self.build_end))
+        build_log.write("Build needed %s\n" % (self.build_end - self.build_start))
         build_log.close()
 
 
