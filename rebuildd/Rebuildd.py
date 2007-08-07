@@ -62,7 +62,7 @@ class Rebuildd(object):
         self.daemonize()
 
         # Run the network server thread
-        RebuilddLog().info("Launching network servers")
+        RebuilddLog().info("Launching network server")
         self.netserv = RebuilddNetworkServer(self)
         self.netserv.setDaemon(True)
         self.netserv.start()
