@@ -124,7 +124,7 @@ class Rebuildd(object):
 
             jobs = []
             for arch in (self.cfg.arch, "all"):
-                jobs.extend(Job.selectBy(build_status=JOBSTATUS.WAIT, arch=arch))
+                jobs.extend(Job.selectBy(build_status=JOBSTATUS.WAIT, arch=arch)[:max_new])
 
             count_new = 0
             for job in jobs:
