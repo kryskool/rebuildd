@@ -1,4 +1,4 @@
-rebuildd (0.2.1) UNRELEASED; urgency=low
+rebuildd (0.2.1) unstable; urgency=low
 
   * Add --download-only to apt-get source by default
     and put only one -q
