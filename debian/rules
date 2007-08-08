@@ -9,6 +9,7 @@ build/rebuildd::
 	@echo Running test suite
 	./tests/runtest.py
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd.manpage.xml
+	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd-job.manpage.xml
 	echo -e 'from rebuildd.RebuilddConfig import RebuilddConfig\nprint RebuilddConfig(True).dump()' | python > debian/rebuilddrc
 
 install/rebuildd::
