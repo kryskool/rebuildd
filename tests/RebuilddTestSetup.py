@@ -8,6 +8,7 @@ def rebuildd_global_test_setup():
         RebuilddConfig(dontparse=True)
         RebuilddConfig().set('log', 'logs_dir', '/tmp')
         RebuilddConfig().set('build', 'database_uri', 'sqlite:///tmp/rebuildd-tests.db')
+        RebuilddConfig().set('build', 'max_jobs', '100')
         RebuilddConfig().set('log', 'file', '/dev/null')
         RebuilddConfig().set('log', 'mail_failed', '0')
         RebuilddConfig().set('log', 'mail_successful', '0')

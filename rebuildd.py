@@ -43,5 +43,8 @@ if len(sys.argv) == 2:
     if sys.argv[1] == "dumpconfig":
         print RebuilddConfig().dump()
         sys.exit(0)
+    if sys.argv[1] == "fix":
+        Rebuildd().fix_jobs()
+        sys.exit(0)
 
 Rebuildd().daemon()

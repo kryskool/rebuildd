@@ -73,8 +73,6 @@ class Rebuildd(object):
         self.loop()
 
         # On exit
-        RebuilddLog().info("Sending last logs")
-        self.send_build_logs()
         RebuilddLog().info("Cleaning finished and canceled jobs")
         self.clean_jobs()
         RebuilddLog().info("Stopping all jobs")
@@ -129,7 +127,7 @@ class Rebuildd(object):
 
             count_new = 0
             for job in jobs:
-                if count_current < max_new and self.get_job(job.id) == None:
+                if count_current < max_new:
                     job.build_status = JOBSTATUS.WAIT_LOCKED
                     job.host = socket.gethostname()
                     self.jobs.append(job)
@@ -137,7 +135,6 @@ class Rebuildd(object):
                     count_current += 1
                 else:
                     break
-
         return count_new
 
     def count_running_jobs(self):
@@ -175,13 +172,6 @@ class Rebuildd(object):
         RebuilddLog().info("Running threads: %s/%s" % (running_threads, max_threads))
 
         return jobs_started
-
-    def send_build_logs(self):
-        """Send all finished build logs"""
-
-        with self.jobs_locker:
-            for job in self.jobs:
-                job.send_build_log()
 
     def dump_jobs(self):
         """Dump all jobs status"""
@@ -251,11 +241,8 @@ class Rebuildd(object):
             # Maybe we found no packages, so create a brand new one!
             pkg = Package(name=name, version=version)
 
-        jobs = []
-        jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT))
-        jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT_LOCKED))
-        jobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.BUILDING))
-        if len(jobs):
+        jobs_count = Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT).count()
+        if jobs_count:
             RebuilddLog().error("Job already existing for %s_%s on %s/%s, don't adding it" \
                            % (pkg.name, pkg.version, dist, arch))
             return False
@@ -290,6 +277,23 @@ class Rebuildd(object):
                     if job.build_status == JOBSTATUS.WAIT_LOCKED:
                         job.build_status = JOBSTATUS.WAIT
                         job.host = ""
+
+        return True
+
+    def fix_jobs(self, print_result=True):
+        """If rebuildd crashed, reset jobs to a valid state"""
+
+        jobs = []
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.WAIT_LOCKED))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.BUILDING))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.BUILD_FAILED))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.BUILD_OK))
+
+        for job in jobs:
+            if print_result:
+                print "I: Fixing job %s (was %s)" % (job.id, JOBSTATUS.whatis(job.build_status))
+            job.host = None
+            job.build_status = JOBSTATUS.WAIT
 
         return True
 

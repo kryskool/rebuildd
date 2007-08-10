@@ -19,5 +19,5 @@ install/rebuildd::
 	dh_installinit --name=rebuildd-httpd
 
 cleanbuilddir/rebuildd::
-	rm -f rebuildd.1
+	rm -f rebuildd.1 rebuildd-job.1
 	rm -f debian/rebuilddrc

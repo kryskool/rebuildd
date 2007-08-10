@@ -45,7 +45,7 @@
     <cmdsynopsis>
       <command>&dhpackage;</command>
 
-      <arg><option>init|dumpconfig</option></arg>
+      <arg><option>init|dumpconfig|fix</option></arg>
 
     </cmdsynopsis>
   </refsynopsisdiv>
@@ -74,6 +74,15 @@
         </term>
         <listitem>
           <para>Dump configuration.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>fix</option>
+        </term>
+        <listitem>
+          <para>Fix database. If rebuildd crashed, some job can be still
+              in a inconsistent state. This will reset all this jobs for
+              this host to a WAIT status</para>
         </listitem>
       </varlistentry>
     </variablelist>
