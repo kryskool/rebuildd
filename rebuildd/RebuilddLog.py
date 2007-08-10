@@ -31,23 +31,26 @@ class RebuilddLog(object):
         return cls._instance
 
     def init(self):
-        self.cfg = RebuilddConfig()
+        cfg = RebuilddConfig()
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s %(message)s',
-                            filename=self.cfg.get('log', 'file'),
-                            datefmt=self.cfg.get('log', 'time_format'),
+                            filename=cfg.get('log', 'file'),
+                            datefmt=cfg.get('log', 'time_format'),
                             filemode='a')
 
+    @classmethod
     def info(self, str):
         """Log a string with info priority"""
 
         logging.info(str)
 
+    @classmethod
     def warn(self, str):
         """Log a string with warn priority"""
         
         logging.warning(str)
 
+    @classmethod
     def error(self, str):
         """Log a string with error priority"""
         

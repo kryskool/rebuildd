@@ -54,7 +54,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
         """Override setattr to log build status changes"""
 
         if name == "build_status":
-            RebuilddLog().info("Job %s for %s_%s on %s/%s changed status from %s to %s"\
+            RebuilddLog.info("Job %s for %s_%s on %s/%s changed status from %s to %s"\
                     % (self.id, self.package.name, self.package.version, 
                        self.dist, self.arch,
                        JobStatus.whatis(self.build_status),
@@ -122,11 +122,11 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         if self.do_quit.isSet():
             # Kill gently the process
-            RebuilddLog().info("Killing job %s with SIGINT" % self.id)
+            RebuilddLog.info("Killing job %s with SIGINT" % self.id)
             try:
                 os.killpg(os.getpgid(proc.pid), signal.SIGINT)
             except OSError, error:
-                RebuilddLog().error("Error killing job %s: %s" % (self.id, error))
+                RebuilddLog.error("Error killing job %s: %s" % (self.id, error))
 
             # If after 60s it's not dead, KILL HIM
             counter = 0
@@ -134,7 +134,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 time.sleep(1)
                 counter += 1
             if proc.poll() == None:
-                RebuilddLog().error("Killing job %s timed out, killing with SIGKILL" \
+                RebuilddLog.error("Killing job %s timed out, killing with SIGKILL" \
                            % self.id)
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
 
@@ -217,7 +217,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 for line in build_log.readlines():
                     log += line
         except IOError, error:
-            RebuilddLog().error("Unable to open logfile for job %d" % self.id)
+            RebuilddLog.error("Unable to open logfile for job %d" % self.id)
             return False
 
         msg.set_payload(log)
@@ -234,7 +234,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                               RebuilddConfig().get('mail', 'mailto'),
                               msg.as_string())
         except Exception, error:
-            RebuilddLog().error("Unable to send build log mail for job %d: %s" % (self.id, error))
+            RebuilddLog.error("Unable to send build log mail for job %d: %s" % (self.id, error))
 
         with self.status_lock:
             if self.build_status == JobStatus.BUILD_OK:

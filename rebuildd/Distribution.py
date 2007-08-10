@@ -32,7 +32,7 @@ class Distribution(object):
             return RebuilddConfig().get('build', 'source_cmd') \
                     % (self.name, package.name, package.version)
         except TypeError, error:
-            RebuilddLog().error("get_source_cmd has invalid format: %s" % error)
+            RebuilddLog.error("get_source_cmd has invalid format: %s" % error)
             return None
  
     def get_build_cmd(self, package):
@@ -50,7 +50,7 @@ class Distribution(object):
             return RebuilddConfig().get('build', 'build_cmd') \
                     % (self.name, package.name, package.version)
         except TypeError, error:
-            RebuilddLog().error("get_build_cmd has invalid format: %s" % error)
+            RebuilddLog.error("get_build_cmd has invalid format: %s" % error)
             return None
 
     def get_post_build_cmd(self, package):
@@ -62,5 +62,5 @@ class Distribution(object):
         try:
             return cmd % (self.name, package.name, package.version)
         except TypeError, error:
-            RebuilddLog().error("post_build_cmd has invalid format: %s" % error)
+            RebuilddLog.error("post_build_cmd has invalid format: %s" % error)
             return None
