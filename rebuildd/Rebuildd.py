@@ -172,7 +172,7 @@ class Rebuildd(object):
                         jobs_started += 1
                         running_threads = running_threads + 1
 
-        RebuilddLog.info("Running threads: build: %s/%s real: %s" %
+        RebuilddLog.info("Running threads: [ build %s/%s ] [ real %s ]" %
                            (running_threads, max_threads, threading.activeCount()))
 
         return jobs_started
