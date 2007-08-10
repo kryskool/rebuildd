@@ -22,7 +22,7 @@ import threading, subprocess, smtplib, time, os, signal, socket, select
 import sqlobject
 from email.Message import Message
 from Dists import Dists
-from Jobstatus import JOBSTATUS
+from JobStatus import JobStatus
 from RebuilddLog import RebuilddLog
 from RebuilddConfig import RebuilddConfig
 
@@ -31,7 +31,7 @@ __version__ = "$Rev$"
 class Job(threading.Thread, sqlobject.SQLObject):
     """Class implementing a build job"""
 
-    build_status = sqlobject.IntCol(default=JOBSTATUS.UNKNOWN)
+    build_status = sqlobject.IntCol(default=JobStatus.UNKNOWN)
     mailto = sqlobject.StringCol(default=None)
     package = sqlobject.ForeignKey('Package', cascade=True)
     dist = sqlobject.StringCol(default='sid')
@@ -57,8 +57,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
             RebuilddLog().info("Job %s for %s_%s on %s/%s changed status from %s to %s"\
                     % (self.id, self.package.name, self.package.version, 
                        self.dist, self.arch,
-                       JOBSTATUS.whatis(self.build_status),
-                       JOBSTATUS.whatis(value)))
+                       JobStatus.whatis(self.build_status),
+                       JobStatus.whatis(value)))
         sqlobject.SQLObject.__setattr__(self, name, value)
 
     @property
@@ -96,7 +96,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         # we are building
         with self.status_lock:
-            self.build_status = JOBSTATUS.BUILDING
+            self.build_status = JobStatus.BUILDING
 
         # execute commands
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
@@ -139,7 +139,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
 
             with self.status_lock:
-                self.build_status = JOBSTATUS.WAIT_LOCKED
+                self.build_status = JobStatus.WAIT_LOCKED
 
             # Reset host
             self.host = None
@@ -152,14 +152,14 @@ class Job(threading.Thread, sqlobject.SQLObject):
         # build is finished
         with self.status_lock:
             if state == 0:
-                self.build_status = JOBSTATUS.BUILD_OK
+                self.build_status = JobStatus.BUILD_OK
             else:
-                self.build_status = JOBSTATUS.BUILD_FAILED
+                self.build_status = JobStatus.BUILD_FAILED
 
         self.build_end = sqlobject.DateTimeCol.now()
 
         build_log.write("******************************************************************************\n")
-        build_log.write("Finished with status %s at %s\n" % (JOBSTATUS.whatis(self.build_status), self.build_end))
+        build_log.write("Finished with status %s at %s\n" % (JobStatus.whatis(self.build_status), self.build_end))
         build_log.write("Build needed %s\n" % (self.build_end - self.build_start))
         build_log.close()
 
@@ -175,21 +175,21 @@ class Job(threading.Thread, sqlobject.SQLObject):
         """When job is built, send logs by mail"""
 
         with self.status_lock:
-            if self.build_status != JOBSTATUS.BUILD_OK and \
-                self.build_status != JOBSTATUS.BUILD_FAILED:
+            if self.build_status != JobStatus.BUILD_OK and \
+                self.build_status != JobStatus.BUILD_FAILED:
                 return False
 
             if not RebuilddConfig().getboolean('log', 'mail_successful') \
-               and self.build_status == JOBSTATUS.BUILD_OK:
-                self.build_status = JOBSTATUS.OK
+               and self.build_status == JobStatus.BUILD_OK:
+                self.build_status = JobStatus.OK
                 return True
             elif not RebuilddConfig().getboolean('log', 'mail_failed') \
-                 and self.build_status == JOBSTATUS.BUILD_FAILED:
-                self.build_status = JOBSTATUS.FAILED
+                 and self.build_status == JobStatus.BUILD_FAILED:
+                self.build_status = JobStatus.FAILED
                 return True
 
 
-        if self.build_status == JOBSTATUS.BUILD_OK:
+        if self.build_status == JobStatus.BUILD_OK:
             bstatus = "successful"
         else:
             bstatus = "failed"
@@ -237,9 +237,9 @@ class Job(threading.Thread, sqlobject.SQLObject):
             RebuilddLog().error("Unable to send build log mail for job %d: %s" % (self.id, error))
 
         with self.status_lock:
-            if self.build_status == JOBSTATUS.BUILD_OK:
-                self.build_status = JOBSTATUS.OK
+            if self.build_status == JobStatus.BUILD_OK:
+                self.build_status = JobStatus.OK
             else:
-                self.build_status = JOBSTATUS.FAILED
+                self.build_status = JobStatus.FAILED
 
         return True

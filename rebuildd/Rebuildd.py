@@ -28,7 +28,7 @@ from RebuilddConfig import RebuilddConfig
 from RebuilddNetworkServer import RebuilddNetworkServer
 from Package import Package
 from Job import Job
-from Jobstatus import JOBSTATUS
+from JobStatus import JobStatus
 import threading, os, time, sys, signal, socket
 import sqlobject
 
@@ -123,12 +123,12 @@ class Rebuildd(object):
 
             jobs = []
             for arch in (self.cfg.arch, "all"):
-                jobs.extend(Job.selectBy(build_status=JOBSTATUS.WAIT, arch=arch)[:max_new])
+                jobs.extend(Job.selectBy(build_status=JobStatus.WAIT, arch=arch)[:max_new])
 
             count_new = 0
             for job in jobs:
                 if count_current < max_new:
-                    job.build_status = JOBSTATUS.WAIT_LOCKED
+                    job.build_status = JobStatus.WAIT_LOCKED
                     job.host = socket.gethostname()
                     self.jobs.append(job)
                     count_new += 1
@@ -143,7 +143,7 @@ class Rebuildd(object):
         count = 0
         with self.jobs_locker:
             for job in self.jobs:
-                if job.build_status == JOBSTATUS.BUILDING and job.isAlive():
+                if job.build_status == JobStatus.BUILDING and job.isAlive():
                     count += 1
 
         return count
@@ -161,7 +161,7 @@ class Rebuildd(object):
                     break
             
                 with job.status_lock:
-                    if job.build_status == JOBSTATUS.WAIT_LOCKED and not job.isAlive():
+                    if job.build_status == JobStatus.WAIT_LOCKED and not job.isAlive():
                         RebuilddLog().info("Starting new thread for job %s" % job.id)
                         job.notify = self.job_finished
                         job.setDaemon(True)
@@ -184,7 +184,7 @@ class Rebuildd(object):
                             (job.id,
                              job.package.name,
                              job.package.version,
-                             JOBSTATUS.whatis(job.build_status),
+                             JobStatus.whatis(job.build_status),
                              job.dist,
                              job.arch,
                              job.mailto)
@@ -201,7 +201,7 @@ class Rebuildd(object):
                     job.do_quit.set()
                     job.join()
                 with job.status_lock:
-                    job.build_status = JOBSTATUS.CANCELED
+                    job.build_status = JobStatus.CANCELED
                 self.jobs.remove(job)
                 RebuilddLog().info("Canceled job %s for %s_%s on %s/%s for %s" \
                                 % (job.id, job.package.name, job.package.version,
@@ -215,7 +215,7 @@ class Rebuildd(object):
 
         with self.jobs_locker:
             for job in self.jobs:
-                if job.build_status == JOBSTATUS.BUILDING and job.isAlive():
+                if job.build_status == JobStatus.BUILDING and job.isAlive():
                     job.do_quit.set()
                     RebuilddLog().info("Sending stop to job %s" % job.id)
             for job in self.jobs:
@@ -242,14 +242,14 @@ class Rebuildd(object):
             # Maybe we found no packages, so create a brand new one!
             pkg = Package(name=name, version=version)
 
-        jobs_count = Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JOBSTATUS.WAIT).count()
+        jobs_count = Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, build_status=JobStatus.WAIT).count()
         if jobs_count:
             RebuilddLog().error("Job already existing for %s_%s on %s/%s, don't adding it" \
                            % (pkg.name, pkg.version, dist, arch))
             return False
 
         job = Job(package=pkg, dist=dist, arch=arch)
-        job.build_status = JOBSTATUS.WAIT
+        job.build_status = JobStatus.WAIT
         job.arch = arch
         job.mailto = mailto
 
@@ -262,9 +262,9 @@ class Rebuildd(object):
 
         with self.jobs_locker:
             for job in self.jobs:
-                if job.build_status == JOBSTATUS.OK \
-                   or job.build_status == JOBSTATUS.FAILED \
-                   or job.build_status == JOBSTATUS.CANCELED:
+                if job.build_status == JobStatus.OK \
+                   or job.build_status == JobStatus.FAILED \
+                   or job.build_status == JobStatus.CANCELED:
                     self.jobs.remove(job)
 
         return True
@@ -275,8 +275,8 @@ class Rebuildd(object):
         with self.jobs_locker:
             for job in self.jobs:
                 with job.status_lock:
-                    if job.build_status == JOBSTATUS.WAIT_LOCKED:
-                        job.build_status = JOBSTATUS.WAIT
+                    if job.build_status == JobStatus.WAIT_LOCKED:
+                        job.build_status = JobStatus.WAIT
                         job.host = ""
 
         return True
@@ -285,16 +285,16 @@ class Rebuildd(object):
         """If rebuildd crashed, reset jobs to a valid state"""
 
         jobs = []
-        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.WAIT_LOCKED))
-        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.BUILDING))
-        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.BUILD_FAILED))
-        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JOBSTATUS.BUILD_OK))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.WAIT_LOCKED))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.BUILDING))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.BUILD_FAILED))
+        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.BUILD_OK))
 
         for job in jobs:
             if print_result:
-                print "I: Fixing job %s (was %s)" % (job.id, JOBSTATUS.whatis(job.build_status))
+                print "I: Fixing job %s (was %s)" % (job.id, JobStatus.whatis(job.build_status))
             job.host = None
-            job.build_status = JOBSTATUS.WAIT
+            job.build_status = JobStatus.WAIT
 
         return True
 

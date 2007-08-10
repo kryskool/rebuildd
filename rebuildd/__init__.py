@@ -25,7 +25,7 @@ __all__ = [
         "Distribution",
         "Enumeration",
         "Job",
-        "Jobstatus",
+        "JobStatus",
         "Package",
         "Rebuildd",
         "RebuilddConfig",

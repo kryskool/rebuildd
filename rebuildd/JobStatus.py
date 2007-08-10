@@ -18,7 +18,7 @@
 
 from Enumeration import Enumeration
 
-JOBSTATUS = Enumeration([ ("UNKNOWN", 0), 
+JobStatus = Enumeration([ ("UNKNOWN", 0), 
                           ("WAIT", 100), 
                           ("WAIT_LOCKED", 150),
                           ("BUILDING", 200), 

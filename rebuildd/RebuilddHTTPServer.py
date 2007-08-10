@@ -20,7 +20,7 @@ from RebuilddConfig import RebuilddConfig
 from Rebuildd import Rebuildd
 from Package import Package
 from Job import Job
-from Jobstatus import JOBSTATUS
+from JobStatus import JobStatus
 
 import tempfile, socket, sqlobject
 import web
@@ -113,16 +113,16 @@ class RequestGraph:
         jf = 0
         jo = 0
         for job in jobs:
-            if job.build_status == JOBSTATUS.WAIT or \
-               job.build_status == JOBSTATUS.WAIT_LOCKED:
+            if job.build_status == JobStatus.WAIT or \
+               job.build_status == JobStatus.WAIT_LOCKED:
                 jw += 1
-            elif job.build_status == JOBSTATUS.BUILDING:
+            elif job.build_status == JobStatus.BUILDING:
                 jb += 1
-            elif job.build_status == JOBSTATUS.BUILD_FAILED or \
-                 job.build_status == JOBSTATUS.FAILED:
+            elif job.build_status == JobStatus.BUILD_FAILED or \
+                 job.build_status == JobStatus.FAILED:
                 jf += 1
-            elif job.build_status == JOBSTATUS.BUILD_OK or \
-                 job.build_status == JOBSTATUS.OK:
+            elif job.build_status == JobStatus.BUILD_OK or \
+                 job.build_status == JobStatus.OK:
                 jo += 1
 
         return (jw, jb, jf, jo)

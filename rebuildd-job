@@ -21,7 +21,7 @@
 from rebuildd.Rebuildd import Rebuildd
 from rebuildd.RebuilddConfig import RebuilddConfig
 from rebuildd.Package import Package
-from rebuildd.Jobstatus import JOBSTATUS
+from rebuildd.JobStatus import JobStatus
 from rebuildd.Job import Job
 import sys, os.path
 
@@ -82,7 +82,7 @@ def list():
 
     if critname == "status":
         try:
-            print_jobs(Job.selectBy(build_status=getattr(JOBSTATUS, critvalue)))
+            print_jobs(Job.selectBy(build_status=getattr(JobStatus, critvalue)))
         except AttributeError:
             print "E: unknown status"
             sys.exit(1)
@@ -92,13 +92,13 @@ def list():
 
 def stats():
     nbjobs = Job.selectBy().count()
-    wait = Job.selectBy(build_status=JOBSTATUS.WAIT).count()
-    wait += Job.selectBy(build_status=JOBSTATUS.WAIT_LOCKED).count()
-    building = Job.selectBy(build_status=JOBSTATUS.BUILDING).count()
-    ok = Job.selectBy(build_status=JOBSTATUS.OK).count()
-    ok += Job.selectBy(build_status=JOBSTATUS.BUILD_OK).count()
-    failed = Job.selectBy(build_status=JOBSTATUS.FAILED).count()
-    failed += Job.selectBy(build_status=JOBSTATUS.BUILD_FAILED).count()
+    wait = Job.selectBy(build_status=JobStatus.WAIT).count()
+    wait += Job.selectBy(build_status=JobStatus.WAIT_LOCKED).count()
+    building = Job.selectBy(build_status=JobStatus.BUILDING).count()
+    ok = Job.selectBy(build_status=JobStatus.OK).count()
+    ok += Job.selectBy(build_status=JobStatus.BUILD_OK).count()
+    failed = Job.selectBy(build_status=JobStatus.FAILED).count()
+    failed += Job.selectBy(build_status=JobStatus.BUILD_FAILED).count()
 
     if nbjobs > 0:
         wait *= 10.0 / nbjobs
@@ -137,7 +137,7 @@ def stats():
 
 def delete(jobid):
     job = Job.get(jobid)
-    if job.build_status == JOBSTATUS.WAIT:
+    if job.build_status == JobStatus.WAIT:
         if job.destroySelf():
             print "I: job %s deleted" % jobid
         else:
@@ -155,7 +155,7 @@ def print_jobs(jobs):
         for job in jobs:
             print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %06.6s" % \
                     (job.id, job.package.name, job.package.version,
-                     JOBSTATUS.whatis(job.build_status),
+                     JobStatus.whatis(job.build_status),
                      job.dist, job.arch)
     except IOError:
         pass
