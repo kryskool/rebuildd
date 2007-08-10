@@ -61,23 +61,16 @@ class Job(threading.Thread, sqlobject.SQLObject):
                        JOBSTATUS.whatis(value)))
         sqlobject.SQLObject.__setattr__(self, name, value)
 
-    def open_logfile(self, mode="r"):
-        """Open logfile and return file object"""
+    @property
+    def logfile(self):
+        """Compute and return logfile name"""
 
         build_log_file = "%s/%s_%s-%s-%s-%s.%s.log" % (RebuilddConfig().get('log', 'logs_dir'),
                                            self.package.name, self.package.version,
                                            self.dist, self.arch,
                                            self.creation_date.strftime("%Y%m%d-%H%M%S"),
                                            self.id)
-        try:
-            build_log = open(build_log_file, mode)
-        except Exception, error:
-            # Don't log if file does not exist
-            if error.errno != 2:
-                RebuilddLog().error("Unable to open log file %s for job %s: %s" 
-                                     % (build_log_file, self.id, error))
-            return None
-        return build_log
+        return build_log_file
 
     def preexec_child(self):
         """Start a new group process before executing child"""
@@ -87,26 +80,23 @@ class Job(threading.Thread, sqlobject.SQLObject):
     def run(self):
         """Run job thread, download and build the package"""
 
-        build_log = self.open_logfile("w")
-        if not build_log:
+        self.build_start = sqlobject.DateTimeCol.now()
+
+        try:
+            with open(self.logfile, "w") as build_log:
+                build_log.write("Automatic build of %s_%s on %s for %s/%s by rebuildd %s\n" % \
+                                 (self.package.name, self.package.version,
+                                  self.host, self.dist, self.arch, __version__))
+                build_log.write("Build started at %s\n" % self.build_start)
+                build_log.write("******************************************************************************\n")
+        except IOError:
             return
+
+        build_log = file(self.logfile, "a")
 
         # we are building
         with self.status_lock:
             self.build_status = JOBSTATUS.BUILDING
-
-        self.build_start = sqlobject.DateTimeCol.now()
-
-        build_log.write("Automatic build of %s_%s on %s for %s/%s by rebuildd %s\n" % \
-                         (self.package.name, self.package.version,
-                          self.host, self.dist, self.arch, __version__))
-        build_log.write("Build started at %s\n" % self.build_start)
-        build_log.write("******************************************************************************\n")
-        build_log.close()
-
-        build_log = self.open_logfile("a")
-        if not build_log:
-            return
 
         # execute commands
         for cmd in (Dists().dists[self.dist].get_source_cmd(self.package),
@@ -221,13 +211,14 @@ class Job(threading.Thread, sqlobject.SQLObject):
         msg['X-Rebuildd-Host'] = socket.getfqdn()
 
       
-        build_log = self.open_logfile("r")
-        if not build_log:
+        try:
+            with open(self.logfile, "r") as build_log:
+                log = ""
+                for line in build_log.readlines():
+                    log += line
+        except IOError, error:
+            RebuilddLog().error("Unable to open logfile for job %d" % self.id)
             return False
-
-        log = ""
-        for line in build_log.readlines():
-            log += line
 
         msg.set_payload(log)
 
@@ -243,7 +234,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                               RebuilddConfig().get('mail', 'mailto'),
                               msg.as_string())
         except Exception, error:
-            RebuilddLog().error("Unable to send build log mail for job %s: %s" % (self.id, error))
+            RebuilddLog().error("Unable to send build log mail for job %d: %s" % (self.id, error))
 
         with self.status_lock:
             if self.build_status == JOBSTATUS.BUILD_OK:

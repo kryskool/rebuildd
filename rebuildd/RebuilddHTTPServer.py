@@ -78,9 +78,10 @@ class RequestJob:
         job = Job.selectBy(id=jobid)[0]
         build_logfile = job.open_logfile()
 
-        if build_logfile:
-            build_log = build_logfile.read()
-        else:
+        try:
+            with open(job.logfile, "r") as build_logfile:
+                build_log = build_logfile.read()
+        except IOError, error:
             build_log = "No build log available"
 
         print render.base(page=render.job(job=job, build_log=build_log), \

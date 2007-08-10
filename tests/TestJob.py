@@ -27,9 +27,9 @@ class TestJob(unittest.TestCase):
         self.assert_(self.job.build_status == JOBSTATUS.WAIT)
 
     def test_open_logfile(self):
-        file = self.job.open_logfile("w")
+        file = open(self.job.logfile, "w")
         self.assert_(file is not None)
-        filero = self.job.open_logfile("r")
+        filero = open(self.job.logfile, "r")
         self.assert_(filero is not None)
         file.close()
         filero.close()
