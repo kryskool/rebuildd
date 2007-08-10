@@ -42,6 +42,7 @@ class RebuilddNetworkServer(threading.Thread):
                 if client_socket:
                     interface = RebuilddNetworkClient(client_socket,
                                                       self.rebuildd)
+                    interface.setDaemon(True)
                     interface.start()
             except socket.timeout:
                 pass
