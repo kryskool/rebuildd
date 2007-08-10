@@ -44,6 +44,7 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('build', 'check_every', '300')
         self.set('build', 'max_threads', '2')
         self.set('build', 'max_jobs', '5')
+        self.set('build', 'kill_timeout', '90')
         self.set('build', 'source_cmd', 'apt-get -q --download-only -t %s source %s=%s')
         self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/%s.tgz %s_%s.dsc')
         self.set('build', 'post_build_cmd', '')
@@ -60,6 +61,7 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('telnet', 'ip', '0.0.0.0')
         self.set('telnet', 'prompt', 'rebuildd@localhost->')
         self.set('telnet', 'motd', 'Connected on rebuildd on localhost')
+
         self.set('http', 'port', '9998')
         self.set('http', 'ip', '0.0.0.0')
         # This is dedicated to MadCoder
