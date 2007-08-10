@@ -152,7 +152,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 self.build_status = JOBSTATUS.WAIT_LOCKED
 
             # Reset host
-            self.host = ""
+            self.host = None
 
             build_log.write("\nBuild job killed on request\n")
             build_log.close()
