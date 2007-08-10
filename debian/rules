@@ -3,22 +3,33 @@ DEB_PYTHON_SYSTEM=pysupport
 DEB_DH_INSTALL_ARGS=-X.svn
 DEB_DH_INSTALLINIT_ARGS=--no-restart-on-upgrade
 
+
+ifneq (,$(findstring UNRELEASED,$(shell head -n 1 debian/changelog)))
+	FINALVERSION=$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)
+	VERSION="$(FINALVERSION)-r$(shell svn info -R | grep 'Last Changed Rev' | cut -d' ' -f4 | sort -rn | head -n 1)"
+else
+	VERSION=$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)
+endif
+
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/python-distutils.mk
 
-build/rebuildd::
+build/rebuildd:: build-stamp-rebuildd
+build-stamp-rebuildd:
 	@echo Running test suite
 	./tests/runtest.py
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd.manpage.xml
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd-job.manpage.xml
 	echo -e 'from rebuildd.RebuilddConfig import RebuilddConfig\nprint RebuilddConfig(True).dump()' | python > debian/rebuilddrc
+	touch build-stamp-rebuildd
 
 install/rebuildd::
 	install -d debian/rebuildd/usr/sbin
 	install -m 0755 rebuildd.py debian/rebuildd/usr/sbin/rebuildd
-	sed -i "s,^__version__.*$=,__version__ = \"$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)\"," debian/rebuildd/usr/lib/python2.5/site-packages/rebuildd/*.py
-	dh_installinit --name=rebuildd-httpd
+	sed -i "s,^__version__.*$=,__version__ = \"$(VERSION)\"," debian/rebuildd/usr/lib/python2.5/site-packages/rebuildd/*.py
+	dh_installinit --name=rebuildd-httpd $(DEB_DH_INSTALLINIT_ARGS)
 
 cleanbuilddir/rebuildd::
 	rm -f rebuildd.1 rebuildd-job.1
 	rm -f debian/rebuilddrc
+	rm -f build-stamp-rebuildd
