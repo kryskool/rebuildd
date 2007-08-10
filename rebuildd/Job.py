@@ -33,7 +33,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
     build_status = sqlobject.IntCol(default=JOBSTATUS.UNKNOWN)
     mailto = sqlobject.StringCol(default=None)
-    package = sqlobject.ForeignKey('Package')
+    package = sqlobject.ForeignKey('Package', cascade=True)
     dist = sqlobject.StringCol(default='sid')
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
