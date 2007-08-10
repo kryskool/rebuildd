@@ -34,13 +34,13 @@ set -e
 
 case "$1" in
   start)
-	log_daemon_msg "Starting $DESC: " "$NAME"
+	log_daemon_msg "Starting $DESC" "$NAME"
 	start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
 		--background --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
         log_end_msg $?
 	;;
   stop)
-	log_daemon_msg "Stopping $DESC: " "$NAME"
+	log_daemon_msg "Stopping $DESC" "$NAME"
 	start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/$NAME.pid
 	log_end_msg $?
 	;;
@@ -69,7 +69,7 @@ case "$1" in
 	|| exit 0
 	;;
   restart)
-	log_daemon_msg "Restarting $DESC: " "$NAME"
+	log_daemon_msg "Restarting $DESC" "$NAME"
 	start-stop-daemon --stop --quiet --pidfile \
 		/var/run/$NAME.pid --exec $DAEMON
 	sleep 1
