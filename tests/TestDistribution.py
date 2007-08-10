@@ -46,6 +46,11 @@ class TestDistribution(unittest.TestCase):
         self.assert_(self.package.name in cmd)
         self.assert_(self.package.version in cmd)
 
+    def test_invalid_get_post_build_cmd(self):
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true')
+        cmd = self.d.get_post_build_cmd(self.package)
+        self.assert_(cmd is None)
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDistribution)
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -17,6 +17,7 @@
 # 
 
 from RebuilddConfig import RebuilddConfig
+from RebuilddLog import RebuilddLog
 
 class Distribution(object):
     """Class implementing a Debian distribution"""
@@ -27,8 +28,12 @@ class Distribution(object):
     def get_source_cmd(self, package):
         """Return command used for grabing source for this distribution"""
 
-        return RebuilddConfig().get('build', 'source_cmd') \
-                % (self.name, package.name, package.version)
+        try:
+            return RebuilddConfig().get('build', 'source_cmd') \
+                    % (self.name, package.name, package.version)
+        except TypeError, error:
+            RebuilddLog().error("get_source_cmd has invalid format: %s" % error)
+            return None
  
     def get_build_cmd(self, package):
         """Return command used for building source for this distribution"""
@@ -41,8 +46,12 @@ class Distribution(object):
         except ValueError:
             pass
 
-        return RebuilddConfig().get('build', 'build_cmd') \
-                % (self.name, package.name, package.version)
+        try:
+            return RebuilddConfig().get('build', 'build_cmd') \
+                    % (self.name, package.name, package.version)
+        except TypeError, error:
+            RebuilddLog().error("get_build_cmd has invalid format: %s" % error)
+            return None
 
     def get_post_build_cmd(self, package):
         """Return command used after building source for this distribution"""
@@ -50,4 +59,8 @@ class Distribution(object):
         cmd = RebuilddConfig().get('build', 'post_build_cmd')
         if cmd == '':
             return None
-        return cmd % (self.name, package.name, package.version)
+        try:
+            return cmd % (self.name, package.name, package.version)
+        except TypeError, error:
+            RebuilddLog().error("post_build_cmd has invalid format: %s" % error)
+            return None
