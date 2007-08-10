@@ -5,7 +5,6 @@
 from distutils.core import setup
 
 setup(name="rebuildd",
-      version="0.1.0",
       description="Debian packages rebuild tool",
       author="Julien Danjou",
       author_email="acid@debian.org",
