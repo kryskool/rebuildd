@@ -130,7 +130,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
             # If after 60s it's not dead, KILL HIM
             counter = 0
-            timemax = RebuilddConfig.get('build', 'kill_timeout')
+            timemax = RebuilddConfig().get('build', 'kill_timeout')
             while proc.poll() == None and counter < timemax:
                 time.sleep(1)
                 counter += 1
