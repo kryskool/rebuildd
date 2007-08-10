@@ -6,9 +6,9 @@ rebuildd (0.2.2) UNRELEASED; urgency=low
   * Add delete to rebuildd-job
   * Add a fix option to fix database state if rebuildd crashed
   * Remove send_build_logs, not used anymore, cleaning up code
-  * Remove rebuildd-job.1 manpage on clean
+  * Do not restart on upgrade
 
- -- Julien Danjou <acid@debian.org>  Fri, 10 Aug 2007 15:07:22 +0200
+ -- Julien Danjou <acid@debian.org>  Fri, 10 Aug 2007 16:39:32 +0200
 
 rebuildd (0.2.1) unstable; urgency=low
 
