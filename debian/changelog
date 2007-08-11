@@ -1,4 +1,4 @@
-rebuildd (0.2.2) UNRELEASED; urgency=low
+rebuildd (0.2.2) unstable; urgency=low
 
   * Add rebuildd-job manpage
   * Actually we shouldn't add jobs if they are already in database
