@@ -297,6 +297,8 @@ class Rebuildd(object):
                 print "I: Fixing job %s (was %s)" % (job.id, JobStatus.whatis(job.build_status))
             job.host = None
             job.build_status = JobStatus.WAIT
+            job.build_start = None
+            job.build_end = None
 
         return True
 
