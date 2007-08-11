@@ -26,6 +26,7 @@ JobStatus = Enumeration([ ("UNKNOWN", 0),
                           ("BUILD_FAILED", 300), 
                           ("POST_BUILD_FAILED", 350), 
                           ("CANCELED", 800), 
+                          ("GIVEUP", 850),
                           ("FAILED", 900),
                           ("BUILD_OK", 1000) ])
 

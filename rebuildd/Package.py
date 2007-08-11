@@ -17,9 +17,14 @@
 # 
 
 import sqlobject
+import apt
 
 class Package(sqlobject.SQLObject): 
     """Class implemeting a Debian package""" 
  
     name = sqlobject.StringCol() 
     version = sqlobject.StringCol(default=None) 
+
+    @staticmethod
+    def VersionCompare(a, b):
+        return apt.VersionCompare(a.version, b.version)

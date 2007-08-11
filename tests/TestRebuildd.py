@@ -96,6 +96,34 @@ class TestRebuildd(unittest.TestCase):
         c.status = JobStatus.WAIT_LOCKED
         c.host = socket.gethostname()
 
+    def test_build_more_recent(self):
+        self.r.get_new_jobs()
+        RebuilddConfig().set('build', 'build_more_recent', '1')  
+
+        self.r.add_job(name="recenter", version="2.6.1-3", dist="sid")
+        pkg = Package.selectBy(name="recenter", version="2.6.1-3")[0]
+        a = Job.selectBy(package=pkg)[0]
+
+        self.r.add_job(name="recenter", version="1:2.6.1-2", dist="sid")
+        pkg = Package.selectBy(name="recenter", version="1:2.6.1-2")[0]
+        b = Job.selectBy(package=pkg)[0]
+
+        self.r.add_job(name="recenter", version="3.6.1-4", dist="sid")
+        pkg = Package.selectBy(name="recenter", version="3.6.1-4")[0]
+        c = Job.selectBy(package=pkg)[0]
+
+        self.r.add_job(name="recenter", version="2.6.0-2", dist="sid", arch="any")
+        pkg = Package.selectBy(name="recenter", version="2.6.0-2")[0]
+        d = Job.selectBy(package=pkg)[0]
+
+        self.assert_(self.r.get_new_jobs() > 0)
+        self.assert_(a.status == JobStatus.GIVEUP)
+        self.assert_(b.status == JobStatus.WAIT_LOCKED)
+        self.assert_(c.status == JobStatus.GIVEUP)
+        self.assert_(d.status == JobStatus.WAIT_LOCKED)
+
+        RebuilddConfig().set('build', 'build_more_recent', '0')  
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestRebuildd)
     unittest.TextTestRunner(verbosity=2).run(suite)

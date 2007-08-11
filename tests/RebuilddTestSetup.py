@@ -11,6 +11,7 @@ def rebuildd_global_test_setup():
         RebuilddConfig().set('build', 'max_jobs', '100')
         RebuilddConfig().set('log', 'file', '/dev/null')
         RebuilddConfig().set('log', 'mail_failed', '0')
+        RebuilddConfig().set('build', 'build_more_recent', '0') 
         RebuilddConfig().set('log', 'mail_successful', '0')
         try:
             os.unlink("/tmp/rebuildd-tests.db")

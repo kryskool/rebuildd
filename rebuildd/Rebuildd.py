@@ -126,19 +126,58 @@ class Rebuildd(object):
                 return 0
 
             jobs = []
-            for arch in (self.cfg.arch, "all"):
-                jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch=arch)[:max_new])
+            jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch=self.cfg.arch)[:max_new])
+            if self.cfg.getboolean('build', 'build_arch_any'):
+                jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch='any')[:max_new])
 
             count_new = 0
             for job in jobs:
-                if count_current < max_new:
-                    job.status = JobStatus.WAIT_LOCKED
-                    job.host = socket.gethostname()
-                    self.jobs.append(job)
-                    count_new += 1
-                    count_current += 1
-                else:
+                print "Handling job %s %s/%s" % (job.id, job.package.name, job.package.version)
+
+                # Look for higher versions ?
+                if self.cfg.getboolean('build', 'build_more_recent'):
+                    newjob = None
+                    packages = Package.selectBy(name=job.package.name)
+
+                    candidate_packages = []
+                    candidate_packages.extend(packages)
+                    candidate_packages.sort(cmp=Package.VersionCompare)
+                    candidate_packages.reverse()
+
+                    # so there are packages with higher version number
+                    # try to see if there's a job for us
+                    for cpackage in candidate_packages:
+                        candidate_jobs = []
+                        candidate_jobs.extend(Job.selectBy(package=cpackage, arch=self.cfg.arch))
+                        if self.cfg.getboolean('build', 'build_arch_any'):
+                            candidate_jobs.extend(Job.selectBy(package=cpackage, arch='any'))
+                        for cjob in candidate_jobs:
+                            if newjob and newjob.arch == self.cfg.arch and cjob.arch == self.cfg.arch and cjob.status == JobStatus.WAIT:
+                                cjob.status = JobStatus.GIVEUP
+                            elif newjob and newjob.arch == "any" and cjob.status == JobStatus.WAIT:
+                                cjob.status = JobStatus.GIVEUP
+                            elif not newjob and cjob.status == JobStatus.WAIT:
+                                print "   -> CHOSEN"
+                                newjob = cjob
+
+                    job = newjob
+
+
+                # We have to check because it might have changed
+                # between our first select and the build_more_recent sfuffs
+
+                if job == None or job.status != JobStatus.WAIT:
+                    continue
+
+                job.status = JobStatus.WAIT_LOCKED
+                job.host = socket.gethostname()
+                self.jobs.append(job)
+                count_new += 1
+                count_current += 1
+
+                if count_current >= max_new:
                     break
+
         return count_new
 
     def count_running_jobs(self):

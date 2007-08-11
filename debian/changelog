@@ -1,8 +1,12 @@
 rebuildd (0.3.0) UNRELEASED; urgency=low
 
   * Store timestamp of changed status
+  * Add 'build_more_recent' option, to build only the
+    more recent version of a package and set others to GIVEUP
+  * Add a 'build_arch_any' to build (or not) package we want to build anywhere
+    This works like another arch
 
- -- Julien Danjou <acid@debian.org>  Sat, 11 Aug 2007 11:59:04 +0200
+ -- Julien Danjou <acid@debian.org>  Sat, 11 Aug 2007 16:15:34 +0200
 
 rebuildd (0.2.2) unstable; urgency=low
 
