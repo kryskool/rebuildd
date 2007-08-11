@@ -20,13 +20,13 @@ class TestRebuildd(unittest.TestCase):
         self.r = Rebuildd()
 
     def test_add_job(self):
-        ret = self.r.add_job(name="telak", version="0.5-1", dist="sid")
+        ret = self.r.add_job(name="telak", version="0.5-1", priority='optional', dist="sid")
         self.assert_(ret is True)
-        ret = self.r.add_job(name="telak", version="0.5-1", dist="sid")
+        ret = self.r.add_job(name="telak", version="0.5-1", priority='optional', dist="sid")
         self.assert_(ret is False)
-        ret = self.r.add_job(name="telak", version="0.5-1", dist="jaydeerulez")
+        ret = self.r.add_job(name="telak", version="0.5-1", priority='optional', dist="jaydeerulez")
         self.assert_(ret is False)
-        ret = self.r.add_job(name="telak", version="0.6-1", dist="sid")
+        ret = self.r.add_job(name="telak", version="0.6-1", priority='optional', dist="sid")
         self.assert_(ret is True)
 
     def test_clean_jobs(self):
@@ -42,18 +42,18 @@ class TestRebuildd(unittest.TestCase):
         self.assert_(ret is True)
 
     def test_get_job(self):
-        self.r.add_job(name="glibc", version="2.6-3", dist="sid")
+        self.r.add_job(name="glibc", version="2.6-3", priority='required', dist="sid")
         pkg = Package.selectBy(name="glibc", version="2.6-3")[0]
         job = Job.selectBy(package=pkg)[0]
         self.assert_(self.r.get_new_jobs() > 0)
         self.assert_(self.r.get_job(job.id) is job)
 
     def test_get_new_jobs(self):
-        self.r.add_job(name="xpdf", version="3.02-1", dist="lenny")
+        self.r.add_job(name="xpdf", version="3.02-1", priority='optional', dist="lenny")
         self.assert_(self.r.get_new_jobs() >= 1)
 
     def test_cancel_job(self):
-        self.r.add_job(name="glibc", version="2.6-2", dist="sid")
+        self.r.add_job(name="glibc", version="2.6-2", priority='required', dist="sid")
         self.r.get_new_jobs()
         pkg = Package.selectBy(name="glibc", version="2.6-2")[0]
         job = Job.selectBy(package=pkg)[0]
@@ -61,19 +61,19 @@ class TestRebuildd(unittest.TestCase):
         self.assert_(self.r.cancel_job(42) is False)
 
     def test_fix_job(self):
-        self.r.add_job(name="glibc", version="2.6.1-3", dist="sid")
+        self.r.add_job(name="glibc", version="2.6.1-3", priority='required', dist="sid")
         pkg = Package.selectBy(name="glibc", version="2.6.1-3")[0]
         a = Job.selectBy(package=pkg)[0]
         a.status = JobStatus.BUILDING
         a.host = socket.gethostname()
 
-        self.r.add_job(name="xterm", version="1.2-2", dist="sid")
+        self.r.add_job(name="xterm", version="1.2-2", priority='extra', dist="sid")
         pkg = Package.selectBy(name="xterm", version="1.2-2")[0]
         b = Job.selectBy(package=pkg)[0]
         b.status = JobStatus.BUILDING
         b.host = "whoisgonnacallaboxlikethis"
 
-        self.r.add_job(name="iceweasel", version="5.0-2", dist="etch")
+        self.r.add_job(name="iceweasel", version="5.0-2", priority='optional', dist="etch")
         pkg = Package.selectBy(name="iceweasel", version="5.0-2")[0]
         c = Job.selectBy(package=pkg)[0]
         c.status = JobStatus.WAIT_LOCKED
@@ -100,19 +100,19 @@ class TestRebuildd(unittest.TestCase):
         self.r.get_new_jobs()
         RebuilddConfig().set('build', 'build_more_recent', '1')  
 
-        self.r.add_job(name="recenter", version="2.6.1-3", dist="sid")
+        self.r.add_job(name="recenter", version="2.6.1-3", priority='required', dist="sid")
         pkg = Package.selectBy(name="recenter", version="2.6.1-3")[0]
         a = Job.selectBy(package=pkg)[0]
 
-        self.r.add_job(name="recenter", version="1:2.6.1-2", dist="sid")
+        self.r.add_job(name="recenter", version="1:2.6.1-2", priority='required', dist="sid")
         pkg = Package.selectBy(name="recenter", version="1:2.6.1-2")[0]
         b = Job.selectBy(package=pkg)[0]
 
-        self.r.add_job(name="recenter", version="3.6.1-4", dist="sid")
+        self.r.add_job(name="recenter", version="3.6.1-4", priority='required', dist="sid")
         pkg = Package.selectBy(name="recenter", version="3.6.1-4")[0]
         c = Job.selectBy(package=pkg)[0]
 
-        self.r.add_job(name="recenter", version="2.6.0-2", dist="sid", arch="any")
+        self.r.add_job(name="recenter", version="2.6.0-2", priority='required', dist="sid", arch="any")
         pkg = Package.selectBy(name="recenter", version="2.6.0-2")[0]
         d = Job.selectBy(package=pkg)[0]
 

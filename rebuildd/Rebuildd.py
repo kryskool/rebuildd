@@ -132,8 +132,6 @@ class Rebuildd(object):
 
             count_new = 0
             for job in jobs:
-                print "Handling job %s %s/%s" % (job.id, job.package.name, job.package.version)
-
                 # Look for higher versions ?
                 if self.cfg.getboolean('build', 'build_more_recent'):
                     newjob = None
@@ -157,7 +155,6 @@ class Rebuildd(object):
                             elif newjob and newjob.arch == "any" and cjob.status == JobStatus.WAIT:
                                 cjob.status = JobStatus.GIVEUP
                             elif not newjob and cjob.status == JobStatus.WAIT:
-                                print "   -> CHOSEN"
                                 newjob = cjob
 
                     job = newjob
@@ -268,7 +265,7 @@ class Rebuildd(object):
 
         return True
 
-    def add_job(self, name, version, dist, mailto=None, arch=None):
+    def add_job(self, name, version, priority, dist, mailto=None, arch=None):
         """Add a job"""
 
         if not Dists().dists.has_key(dist):
@@ -283,7 +280,7 @@ class Rebuildd(object):
             pkg = pkgs[0]
         else:
             # Maybe we found no packages, so create a brand new one!
-            pkg = Package(name=name, version=version)
+            pkg = Package(name=name, version=version, priority=priority)
 
         jobs_count = Job.selectBy(package=pkg, dist=dist, arch=arch, mailto=mailto, status=JobStatus.WAIT).count()
         if jobs_count:

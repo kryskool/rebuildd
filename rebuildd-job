@@ -40,14 +40,14 @@ def add():
     for line in sys.stdin.readlines():
         empty = False
         args = line.strip().split(' ')
-        if len(args) == 3:
-            Rebuildd().add_job(args[0], args[1], args[2])
         if len(args) == 4:
-            Rebuildd().add_job(args[0], args[1], args[2], mailto=None, arch=args[3])
+            Rebuildd().add_job(args[0], args[1], args[2], args[3])
         if len(args) == 5:
-            Rebuildd().add_job(args[0], args[1], args[2], mailto=args[4], arch=args[3])
+            Rebuildd().add_job(args[0], args[1], args[2], args[3], mailto=None, arch=args[4])
+        if len(args) == 6:
+            Rebuildd().add_job(args[0], args[1], args[2], args[3], mailto=args[5], arch=args[4])
     if empty:
-        print "E: usage: %s\n   read <package> <version> <dist> [arch] [mailto] from stdin" % sys.argv[0]
+        print "E: usage: %s\n   read <package> <version> <priority> <dist> [arch] [mailto] from stdin" % sys.argv[0]
         sys.exit(1)
 
 def list():

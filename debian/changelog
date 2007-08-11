@@ -5,6 +5,7 @@ rebuildd (0.3.0) UNRELEASED; urgency=low
     more recent version of a package and set others to GIVEUP
   * Add a 'build_arch_any' to build (or not) package we want to build anywhere
     This works like another arch
+  * Add 'priority' to package
 
  -- Julien Danjou <acid@debian.org>  Sat, 11 Aug 2007 16:15:34 +0200
 

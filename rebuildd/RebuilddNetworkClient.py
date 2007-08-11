@@ -136,25 +136,28 @@ class RebuilddNetworkClient(threading.Thread):
 
         ret = False
         if len(args) < 4:
-            return "E: usage: job add <name> <ver> <dist> [arch] [mailto]\n"
-
-        if len(args) == 4:
-            ret = self.rebuildd.add_job(name=args[1],
-                                        version=args[2],
-                                        dist=args[3])
+            return "E: usage: job add <name> <ver> <priority> <dist> [arch] [mailto]\n"
 
         if len(args) == 5:
             ret = self.rebuildd.add_job(name=args[1],
                                         version=args[2],
-                                        dist=args[3],
-                                        arch=args[4])
+                                        priority=args[3],
+                                        dist=args[4])
 
         if len(args) == 6:
+            ret = self.rebuildd.add_job(name=args[1],
+                                        version=args[2],
+                                        priority=args[3],
+                                        dist=args[4],
+                                        arch=args[5])
+
+        if len(args) == 7:
             ret = self.rebuildd.add_job(name=args[1], 
                                         version=args[2],
-                                        dist=args[3], 
-                                        arch=args[4],
-                                        mailto=args[5])
+                                        priority=args[3],
+                                        dist=args[4], 
+                                        arch=args[5],
+                                        mailto=args[6])
         
         if ret:
             return "I: job added\n"
