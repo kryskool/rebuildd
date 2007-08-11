@@ -30,6 +30,7 @@ def usage():
     print "Usage: %s [command] <opts>\n" % os.path.basename(sys.argv[0])
     print "Commands:"
     print "   add                     - add jobs, reading from stdin"
+    print "   add-quinn-diff <dist>   - add package reading quinn-diff input from stdin"
     print "   delete <jobid>          - delete job"
     print "   list <criteria>=<value> - list jobs matching criteria"
     print "   stats                   - view a nice graph of build status"
@@ -49,6 +50,13 @@ def add():
     if empty:
         print "E: usage: %s\n   read <package> <version> <priority> <dist> [arch] [mailto] from stdin" % sys.argv[0]
         sys.exit(1)
+
+def add_quinn_diff(dist):
+    for line in sys.stdin.readlines():
+        name = line.split('/')[1].split('_')[0]
+        version = line.split('/')[1].split('_')[1].split('.dsc')[0]
+        priority = line.split('/')[1].split('_')[1].split('.dsc')[1].split(':')[0][2:]
+        Rebuildd().add_job(name, version, priority, dist)
 
 def list():
     if len(sys.argv) == 3:
@@ -165,6 +173,8 @@ if len(sys.argv) > 1:
     Rebuildd()
     if sys.argv[1] == "add":
         add()
+    if sys.argv[1] == "add-quinn-diff" and len(sys.argv) > 2:
+        add_quinn_difF(sys.argv[2])
     if sys.argv[1] == "list":
         list()
     if sys.argv[1] == "stats":

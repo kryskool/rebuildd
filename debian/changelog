@@ -6,8 +6,9 @@ rebuildd (0.3.0) UNRELEASED; urgency=low
   * Add a 'build_arch_any' to build (or not) package we want to build anywhere
     This works like another arch
   * Add 'priority' to package
+  * Add quinn-diff support to rebuildd-job
 
- -- Julien Danjou <acid@debian.org>  Sat, 11 Aug 2007 16:15:34 +0200
+ -- Julien Danjou <acid@debian.org>  Sat, 11 Aug 2007 19:35:56 +0200
 
 rebuildd (0.2.2) unstable; urgency=low
 
