@@ -82,7 +82,7 @@ def list():
 
     if critname == "status":
         try:
-            print_jobs(Job.selectBy(build_status=getattr(JobStatus, critvalue)))
+            print_jobs(Job.selectBy(status=getattr(JobStatus, critvalue)))
         except AttributeError:
             print "E: unknown status"
             sys.exit(1)
@@ -92,13 +92,13 @@ def list():
 
 def stats():
     nbjobs = Job.selectBy().count()
-    wait = Job.selectBy(build_status=JobStatus.WAIT).count()
-    wait += Job.selectBy(build_status=JobStatus.WAIT_LOCKED).count()
-    building = Job.selectBy(build_status=JobStatus.BUILDING).count()
-    ok = Job.selectBy(build_status=JobStatus.BUILD_OK).count()
-    failed = Job.selectBy(build_status=JobStatus.SOURCE_FAILED).count()
-    failed += Job.selectBy(build_status=JobStatus.BUILD_FAILED).count()
-    failed += Job.selectBy(build_status=JobStatus.POST_BUILD_FAILED).count()
+    wait = Job.selectBy(status=JobStatus.WAIT).count()
+    wait += Job.selectBy(status=JobStatus.WAIT_LOCKED).count()
+    building = Job.selectBy(status=JobStatus.BUILDING).count()
+    ok = Job.selectBy(status=JobStatus.BUILD_OK).count()
+    failed = Job.selectBy(status=JobStatus.SOURCE_FAILED).count()
+    failed += Job.selectBy(status=JobStatus.BUILD_FAILED).count()
+    failed += Job.selectBy(status=JobStatus.POST_BUILD_FAILED).count()
 
     if nbjobs > 0:
         wait *= 10.0 / nbjobs
@@ -137,13 +137,13 @@ def stats():
 
 def delete(jobid):
     job = Job.get(jobid)
-    if job.build_status == JobStatus.WAIT:
+    if job.status == JobStatus.WAIT:
         if job.destroySelf():
             print "I: job %s deleted" % jobid
         else:
             print "E: unable to delete job"
     else:
-        print "E: can't delete job, build status is %s and should be WAIT" % job.build_status
+        print "E: can't delete job, build status is %s and should be WAIT" % job.status
 
 def print_headers():
     print "  id  |     package name     |    version     |    status    |  dist  |  arch  "
@@ -155,7 +155,7 @@ def print_jobs(jobs):
         for job in jobs:
             print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %06.6s" % \
                     (job.id, job.package.name, job.package.version,
-                     JobStatus.whatis(job.build_status),
+                     JobStatus.whatis(job.status),
                      job.dist, job.arch)
     except IOError:
         pass

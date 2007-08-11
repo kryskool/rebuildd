@@ -32,12 +32,13 @@ __version__ = "$Rev$"
 class Job(threading.Thread, sqlobject.SQLObject):
     """Class implementing a build job"""
 
-    build_status = sqlobject.IntCol(default=JobStatus.UNKNOWN)
+    status = sqlobject.IntCol(default=JobStatus.UNKNOWN)
     mailto = sqlobject.StringCol(default=None)
     package = sqlobject.ForeignKey('Package', cascade=True)
     dist = sqlobject.StringCol(default='sid')
     arch = sqlobject.StringCol(default='all')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
+    status_changed = sqlobject.DateTimeCol(default=None)
     build_start = sqlobject.DateTimeCol(default=None)
     build_end = sqlobject.DateTimeCol(default=None)
     host = sqlobject.StringCol(default=None)
@@ -54,12 +55,13 @@ class Job(threading.Thread, sqlobject.SQLObject):
     def __setattr__(self, name, value):
         """Override setattr to log build status changes"""
 
-        if name == "build_status":
+        if name == "status":
             RebuilddLog.info("Job %s for %s_%s on %s/%s changed status from %s to %s"\
                     % (self.id, self.package.name, self.package.version, 
                        self.dist, self.arch,
-                       JobStatus.whatis(self.build_status),
+                       JobStatus.whatis(self.status),
                        JobStatus.whatis(value)))
+            self.status_changed = sqlobject.DateTimeCol.now()
         sqlobject.SQLObject.__setattr__(self, name, value)
 
     @property
@@ -97,7 +99,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         # we are building
         with self.status_lock:
-            self.build_status = JobStatus.BUILDING
+            self.status = JobStatus.BUILDING
 
         # execute commands
         for cmd, failed_status in ([Dists().dists[self.dist].get_source_cmd(self.package),
@@ -125,7 +127,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 break
             if state != 0:
                 with self.status_lock:
-                    self.build_status = failed_status
+                    self.status = failed_status
                 break
 
         if self.do_quit.isSet():
@@ -148,7 +150,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
 
             with self.status_lock:
-                self.build_status = JobStatus.WAIT_LOCKED
+                self.status = JobStatus.WAIT_LOCKED
 
             # Reset host
             self.host = None
@@ -161,12 +163,12 @@ class Job(threading.Thread, sqlobject.SQLObject):
         # build is finished
         with self.status_lock:
             if state == 0:
-                self.build_status = JobStatus.BUILD_OK
+                self.status = JobStatus.BUILD_OK
 
         self.build_end = sqlobject.DateTimeCol.now()
 
         build_log.write("******************************************************************************\n")
-        build_log.write("Finished with status %s at %s\n" % (JobStatus.whatis(self.build_status), self.build_end))
+        build_log.write("Finished with status %s at %s\n" % (JobStatus.whatis(self.status), self.build_end))
         build_log.write("Build needed %s\n" % (self.build_end - self.build_start))
         build_log.close()
 
@@ -182,18 +184,18 @@ class Job(threading.Thread, sqlobject.SQLObject):
         """When job is built, send logs by mail"""
 
         with self.status_lock:
-            if self.build_status != JobStatus.BUILD_OK and \
-                not self.build_status in FailedStatus:
+            if self.status != JobStatus.BUILD_OK and \
+                not self.status in FailedStatus:
                 return False
 
             if not RebuilddConfig().getboolean('log', 'mail_successful') \
-               and self.build_status == JobStatus.BUILD_OK:
+               and self.status == JobStatus.BUILD_OK:
                 return True
             elif not RebuilddConfig().getboolean('log', 'mail_failed') \
-                 and self.build_status in FailedStatus:
+                 and self.status in FailedStatus:
                 return True
 
-        if self.build_status == JobStatus.BUILD_OK:
+        if self.status == JobStatus.BUILD_OK:
             bstatus = "successful"
         else:
             bstatus = "failed"

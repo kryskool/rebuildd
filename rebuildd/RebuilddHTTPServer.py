@@ -116,14 +116,14 @@ class RequestGraph:
         jf = 0
         jo = 0
         for job in jobs:
-            if job.build_status == JobStatus.WAIT or \
-               job.build_status == JobStatus.WAIT_LOCKED:
+            if job.status == JobStatus.WAIT or \
+               job.status == JobStatus.WAIT_LOCKED:
                 jw += 1
-            elif job.build_status == JobStatus.BUILDING:
+            elif job.status == JobStatus.BUILDING:
                 jb += 1
-            elif job.build_status in FailedStatus:
+            elif job.status in FailedStatus:
                 jf += 1
-            elif job.build_status == JobStatus.BUILD_OK:
+            elif job.status == JobStatus.BUILD_OK:
                 jo += 1
 
         return (jw, jb, jf, jo)

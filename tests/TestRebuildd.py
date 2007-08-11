@@ -64,36 +64,36 @@ class TestRebuildd(unittest.TestCase):
         self.r.add_job(name="glibc", version="2.6.1-3", dist="sid")
         pkg = Package.selectBy(name="glibc", version="2.6.1-3")[0]
         a = Job.selectBy(package=pkg)[0]
-        a.build_status = JobStatus.BUILDING
+        a.status = JobStatus.BUILDING
         a.host = socket.gethostname()
 
         self.r.add_job(name="xterm", version="1.2-2", dist="sid")
         pkg = Package.selectBy(name="xterm", version="1.2-2")[0]
         b = Job.selectBy(package=pkg)[0]
-        b.build_status = JobStatus.BUILDING
+        b.status = JobStatus.BUILDING
         b.host = "whoisgonnacallaboxlikethis"
 
         self.r.add_job(name="iceweasel", version="5.0-2", dist="etch")
         pkg = Package.selectBy(name="iceweasel", version="5.0-2")[0]
         c = Job.selectBy(package=pkg)[0]
-        c.build_status = JobStatus.BUILD_FAILED
+        c.status = JobStatus.WAIT_LOCKED
         c.host = socket.gethostname()
 
         self.assert_(self.r.fix_jobs(False) is True)
 
-        self.assert_(a.build_status is JobStatus.WAIT)
+        self.assert_(a.status is JobStatus.WAIT)
         self.assert_(a.host is None)
-        self.assert_(b.build_status is JobStatus.BUILDING)
+        self.assert_(b.status is JobStatus.BUILDING)
         self.assert_(b.host is "whoisgonnacallaboxlikethis")
-        self.assert_(c.build_status is JobStatus.WAIT)
+        self.assert_(c.status is JobStatus.WAIT)
         self.assert_(c.host is None)
 
         # Reset to a safe state or get_new_jobs will fail after
-        a.build_status = JobStatus.WAIT_LOCKED
+        a.status = JobStatus.WAIT_LOCKED
         a.host = socket.gethostname()
-        b.build_status = JobStatus.WAIT_LOCKED
+        b.status = JobStatus.WAIT_LOCKED
         b.host = socket.gethostname()
-        c.build_status = JobStatus.WAIT_LOCKED
+        c.status = JobStatus.WAIT_LOCKED
         c.host = socket.gethostname()
 
 if __name__ == '__main__':
