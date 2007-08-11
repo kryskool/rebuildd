@@ -23,6 +23,7 @@ from Rebuildd import Rebuildd
 from Package import Package
 from Job import Job
 from JobStatus import JobStatus
+from JobStatus import FailedStatus
 
 import tempfile, socket, sqlobject
 import web
@@ -120,11 +121,9 @@ class RequestGraph:
                 jw += 1
             elif job.build_status == JobStatus.BUILDING:
                 jb += 1
-            elif job.build_status == JobStatus.BUILD_FAILED or \
-                 job.build_status == JobStatus.FAILED:
+            elif job.build_status in FailedStatus:
                 jf += 1
-            elif job.build_status == JobStatus.BUILD_OK or \
-                 job.build_status == JobStatus.OK:
+            elif job.build_status == JobStatus.BUILD_OK:
                 jo += 1
 
         return (jw, jb, jf, jo)

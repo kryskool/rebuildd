@@ -95,10 +95,10 @@ def stats():
     wait = Job.selectBy(build_status=JobStatus.WAIT).count()
     wait += Job.selectBy(build_status=JobStatus.WAIT_LOCKED).count()
     building = Job.selectBy(build_status=JobStatus.BUILDING).count()
-    ok = Job.selectBy(build_status=JobStatus.OK).count()
-    ok += Job.selectBy(build_status=JobStatus.BUILD_OK).count()
-    failed = Job.selectBy(build_status=JobStatus.FAILED).count()
+    ok = Job.selectBy(build_status=JobStatus.BUILD_OK).count()
+    failed = Job.selectBy(build_status=JobStatus.SOURCE_FAILED).count()
     failed += Job.selectBy(build_status=JobStatus.BUILD_FAILED).count()
+    failed += Job.selectBy(build_status=JobStatus.POST_BUILD_FAILED).count()
 
     if nbjobs > 0:
         wait *= 10.0 / nbjobs

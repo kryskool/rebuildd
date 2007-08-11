@@ -22,8 +22,13 @@ JobStatus = Enumeration([ ("UNKNOWN", 0),
                           ("WAIT", 100), 
                           ("WAIT_LOCKED", 150),
                           ("BUILDING", 200), 
+                          ("SOURCE_FAILED", 250), 
                           ("BUILD_FAILED", 300), 
-                          ("BUILD_OK", 400), 
+                          ("POST_BUILD_FAILED", 350), 
                           ("CANCELED", 800), 
                           ("FAILED", 900),
-                          ("OK", 1000) ]) 
+                          ("BUILD_OK", 1000) ])
+
+FailedStatus = (JobStatus.SOURCE_FAILED,
+                JobStatus.BUILD_FAILED,
+                JobStatus.POST_BUILD_FAILED)

@@ -48,42 +48,42 @@ class TestJob(unittest.TestCase):
         RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
         self.job.start()
         self.job.join()
-        self.assert_(self.job.build_status == JobStatus.OK)
+        self.assert_(self.job.build_status == JobStatus.BUILD_OK)
 
-    def test_build_failure1(self):
+    def test_build_failure_source(self):
         self.job.do_quit.clear()
         RebuilddConfig().set('build', 'source_cmd', '/bin/false %s %s %s')
         RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s')
         RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
         self.job.start()
         self.job.join()
-        self.assert_(self.job.build_status == JobStatus.FAILED)
+        self.assert_(self.job.build_status == JobStatus.SOURCE_FAILED)
 
-    def test_build_failure2(self):
+    def test_build_failure_build(self):
         self.job.do_quit.clear()
         RebuilddConfig().set('build', 'source_cmd', '/bin/true %s %s %s')
         RebuilddConfig().set('build', 'build_cmd', '/bin/false %s %s %s')
         RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
         self.job.start()
         self.job.join()
-        self.assert_(self.job.build_status == JobStatus.FAILED)
+        self.assert_(self.job.build_status == JobStatus.BUILD_FAILED)
 
-    def test_build_failure3(self):
+    def test_build_failure_post_build(self):
         RebuilddConfig().set('build', 'source_cmd', '/bin/true %s %s %s')
         RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s')
         RebuilddConfig().set('build', 'post_build_cmd', '/bin/false %s %s %s')
         self.job.start()
         self.job.join()
-        self.assert_(self.job.build_status == JobStatus.FAILED)
+        self.assert_(self.job.build_status == JobStatus.POST_BUILD_FAILED)
 
     def test_send_build_log(self):
         self.assert_(self.job.send_build_log() is False)
         self.job.build_status = JobStatus.BUILD_OK
         self.assert_(self.job.send_build_log() is True)
-        self.assert_(self.job.build_status is JobStatus.OK)
+        self.assert_(self.job.build_status is JobStatus.BUILD_OK)
         self.job.build_status = JobStatus.BUILD_FAILED
         self.assert_(self.job.send_build_log() is True)
-        self.assert_(self.job.build_status is JobStatus.FAILED)
+        self.assert_(self.job.build_status is JobStatus.BUILD_FAILED)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestJob)

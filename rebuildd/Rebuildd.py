@@ -29,6 +29,7 @@ from RebuilddNetworkServer import RebuilddNetworkServer
 from Package import Package
 from Job import Job
 from JobStatus import JobStatus
+from JobStatus import FailedStatus
 import threading, os, time, sys, signal, socket
 import sqlobject
 
@@ -265,8 +266,8 @@ class Rebuildd(object):
 
         with self.jobs_locker:
             for job in self.jobs:
-                if job.build_status == JobStatus.OK \
-                   or job.build_status == JobStatus.FAILED \
+                if job.build_status == JobStatus.BUILD_OK \
+                   or job.build_status in FailedStatus \
                    or job.build_status == JobStatus.CANCELED:
                     self.jobs.remove(job)
 
@@ -290,8 +291,6 @@ class Rebuildd(object):
         jobs = []
         jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.WAIT_LOCKED))
         jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.BUILDING))
-        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.BUILD_FAILED))
-        jobs.extend(Job.selectBy(host=socket.gethostname(), build_status=JobStatus.BUILD_OK))
 
         for job in jobs:
             if print_result:
