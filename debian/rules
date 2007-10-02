@@ -20,7 +20,7 @@ build-stamp-rebuildd:
 	./tests/runtest.py
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd.manpage.xml
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd-job.manpage.xml
-	echo -e 'from rebuildd.RebuilddConfig import RebuilddConfig\nprint RebuilddConfig(True).dump()' | python > debian/rebuilddrc
+	printf 'from rebuildd.RebuilddConfig import RebuilddConfig\nprint RebuilddConfig(True).dump()\n' | python > debian/rebuilddrc
 	touch build-stamp-rebuildd
 
 install/rebuildd::
