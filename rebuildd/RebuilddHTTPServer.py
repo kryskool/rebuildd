@@ -79,7 +79,6 @@ class RequestJob:
 
     def GET(self, jobid=None):
         job = Job.selectBy(id=jobid)[0]
-        build_logfile = job.open_logfile()
 
         try:
             with open(job.logfile, "r") as build_logfile:

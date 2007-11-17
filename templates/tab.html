@@ -23,23 +23,23 @@ $for job in jobs:
     <td><a href="/dist/$job.dist/arch/$job.arch">$job.dist/$job.arch</a></td>
     <td>$job.creation_date</td>
     <td>$job.mailto</td>
-    $if job.build_status == 0:
+    $if job.status == 0:
         <td bgcolor="gray" align="center">Duh?</td>
-    $if job.build_status == 100:
+    $if job.status == 100:
         <td bgcolor="yellow" align="center">WAIT</td>
-    $if job.build_status == 150:
+    $if job.status == 150:
         <td bgcolor="yellow" align="center">WAIT_LOCKED</td>
-    $if job.build_status == 200:
+    $if job.status == 200:
         <td bgcolor="orange" align="center">BUILDING</td>
-    $if job.build_status == 300:
+    $if job.status == 300:
         <td bgcolor="red" align="center">BUILD_FAILED</td>
-    $if job.build_status == 400:
+    $if job.status == 400:
         <td bgcolor="green" align="center">BUILD_OK</td>
-    $if job.build_status == 800:
+    $if job.status == 800:
         <td bgcolor="red" align="center">CANCELED</td>
-    $if job.build_status == 900:
+    $if job.status == 900:
         <td bgcolor="red" align="center">FAILED</td>
-    $if job.build_status == 1000:
+    $if job.status == 1000:
         <td bgcolor="green" align="center">OK</td>
     <td><a href="/host/$job.host"></a>$job.host</td>
     <td>$job.build_start</td>
