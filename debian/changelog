@@ -9,6 +9,7 @@ rebuildd (0.3.0) UNRELEASED; urgency=low
   * Add quinn-diff support to rebuildd-job
   * Fix bashim in debian/rules
   * Add python-apt to build-deps
+  * Add some doc in README.Debian (Closes: #443636)
 
  -- Julien Danjou <acid@debian.org>  Sat, 11 Aug 2007 19:35:56 +0200
 

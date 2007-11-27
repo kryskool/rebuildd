@@ -1,0 +1,11 @@
+rebuildd
+========
+
+In order to use rebuildd you need to:
+1. Edit configuration files;
+2. Run rebuildd-init-build-system
+   to create pbuilder archives;
+3. Run rebuildd init
+   to create database tables.
+
+ -- Julien Danjou <acid@debian.org>  Tue, 27 Nov 2007 15:07:10 +0100
