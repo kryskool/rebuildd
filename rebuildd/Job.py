@@ -36,7 +36,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
     mailto = sqlobject.StringCol(default=None)
     package = sqlobject.ForeignKey('Package', cascade=True)
     dist = sqlobject.StringCol(default='sid')
-    arch = sqlobject.StringCol(default='all')
+    arch = sqlobject.StringCol(default='any')
     creation_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
     status_changed = sqlobject.DateTimeCol(default=None)
     build_start = sqlobject.DateTimeCol(default=None)
