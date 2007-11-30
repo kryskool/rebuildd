@@ -22,13 +22,16 @@ function pbuilder_create
             exit 1
         fi
 
-        echo "I: Initializing pbuilder for $DISTS"
         for d in $DISTS
         do
-            $PBUILDER_BIN create --basetgz $PBUILDER_CACHE_PATH/${d}.tgz --distribution $d --mirror $PBUILDER_MIRROR
+            for a in $ARCHS
+            do
+                echo "I: Initializing pbuilder for ${d}-${a}"
+                $PBUILDER_BIN create --debootstrapopts --arch=$a --basetgz $PBUILDER_CACHE_PATH/${d}-${a}.tgz --distribution $d --mirror $PBUILDER_MIRROR
+            done
         done
         echo "I: Init done, please remember to set rebuildd configuration to the correct value:"
-        echo "build_cmd = pbuilder build --basetgz $PBUILDER_CACHE_PATH/%s.tgz %s_%s.dsc"
+        echo "build_cmd = pbuilder build --basetgz $PBUILDER_CACHE_PATH/%s-%s.tgz %s_%s.dsc"
 }
 
 
@@ -40,14 +43,17 @@ function cowbuilder_create
             exit 1
         fi
 
-        echo "I: Initializing cowbuilder for $DISTS"
         for d in $DISTS
         do
-            $COWBUILDER_BIN --create --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
+            for a in $ARCHS
+            do
+                echo "I: Initializing cowbuilder for ${d}-${a}"
+                $COWBUILDER_BIN --create --debootstrapopts --arch=$a --basepath $PBUILDER_CACHE_PATH/${d}-${a}.cow --distribution $d --mirror $PBUILDER_MIRROR
+            done
         done
 
         echo "I: Init done, please remember to set rebuildd configuration to the correct value:"
-        echo "build_cmd = cowbuilder --build --basepath $PBUILDER_CACHE_PATH/%s.cow %s_%s.dsc"
+        echo "build_cmd = cowbuilder --build --basepath $PBUILDER_CACHE_PATH/%s-%s.cow %s_%s.dsc"
 }
 
 

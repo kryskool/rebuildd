@@ -99,16 +99,17 @@ class TestRebuildd(unittest.TestCase):
     def test_build_more_recent(self):
         self.r.get_new_jobs()
         RebuilddConfig().set('build', 'build_more_recent', '1')  
+        RebuilddConfig().arch.append("alpha")
 
-        self.r.add_job(name="recenter", version="2.6.1-3", priority='required', dist="sid")
+        self.r.add_job(name="recenter", version="2.6.1-3", priority='required', dist="sid", arch="alpha")
         pkg = Package.selectBy(name="recenter", version="2.6.1-3")[0]
         a = Job.selectBy(package=pkg)[0]
 
-        self.r.add_job(name="recenter", version="1:2.6.1-2", priority='required', dist="sid")
+        self.r.add_job(name="recenter", version="1:2.6.1-2", priority='required', dist="sid", arch="alpha")
         pkg = Package.selectBy(name="recenter", version="1:2.6.1-2")[0]
         b = Job.selectBy(package=pkg)[0]
 
-        self.r.add_job(name="recenter", version="3.6.1-4", priority='required', dist="sid")
+        self.r.add_job(name="recenter", version="3.6.1-4", priority='required', dist="sid", arch="alpha")
         pkg = Package.selectBy(name="recenter", version="3.6.1-4")[0]
         c = Job.selectBy(package=pkg)[0]
 
@@ -116,11 +117,16 @@ class TestRebuildd(unittest.TestCase):
         pkg = Package.selectBy(name="recenter", version="2.6.0-2")[0]
         d = Job.selectBy(package=pkg)[0]
 
+        self.r.add_job(name="recenter", version="4.6.0-2", priority='required', dist="sid", arch="any")
+        pkg = Package.selectBy(name="recenter", version="4.6.0-2")[0]
+        e = Job.selectBy(package=pkg)[0]
+
         self.assert_(self.r.get_new_jobs() > 0)
         self.assert_(a.status == JobStatus.GIVEUP)
         self.assert_(b.status == JobStatus.WAIT_LOCKED)
         self.assert_(c.status == JobStatus.GIVEUP)
-        self.assert_(d.status == JobStatus.WAIT_LOCKED)
+        self.assert_(d.status == JobStatus.GIVEUP)
+        self.assert_(e.status == JobStatus.WAIT_LOCKED)
 
         RebuilddConfig().set('build', 'build_more_recent', '0')  
 

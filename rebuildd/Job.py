@@ -102,11 +102,11 @@ class Job(threading.Thread, sqlobject.SQLObject):
             self.status = JobStatus.BUILDING
 
         # execute commands
-        for cmd, failed_status in ([Dists().dists[self.dist].get_source_cmd(self.package),
+        for cmd, failed_status in ([Dists().get_dist(self.dist, self.arch).get_source_cmd(self.package),
                                     JobStatus.SOURCE_FAILED],
-                                   [Dists().dists[self.dist].get_build_cmd(self.package),
+                                   [Dists().get_dist(self.dist, self.arch).get_build_cmd(self.package),
                                     JobStatus.BUILD_FAILED],
-                                   [Dists().dists[self.dist].get_post_build_cmd(self.package),
+                                   [Dists().get_dist(self.dist, self.arch).get_post_build_cmd(self.package),
                                     JobStatus.POST_BUILD_FAILED]):
             if cmd is None:
                 continue

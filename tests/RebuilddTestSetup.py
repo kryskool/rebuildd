@@ -13,6 +13,7 @@ def rebuildd_global_test_setup():
         RebuilddConfig().set('log', 'mail_failed', '0')
         RebuilddConfig().set('build', 'build_more_recent', '0') 
         RebuilddConfig().set('log', 'mail_successful', '0')
+        RebuilddConfig().arch = ["alpha", "any"]
         try:
             os.unlink("/tmp/rebuildd-tests.db")
         except OSError:

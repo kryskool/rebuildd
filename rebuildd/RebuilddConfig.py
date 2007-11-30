@@ -46,13 +46,13 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('build', 'max_jobs', '5')
         self.set('build', 'kill_timeout', '90')
         self.set('build', 'source_cmd', 'apt-get -q --download-only -t %s source %s=%s')
-        self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/%s.tgz %s_%s.dsc')
+        self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/%s-%s.tgz %s_%s.dsc')
         self.set('build', 'post_build_cmd', '')
         self.set('build', 'dists', 'etch lenny sid')
         self.set('build', 'work_dir', '/var/cache/rebuildd/build')
         self.set('build', 'database_uri', 'sqlite:///var/lib/rebuildd/rebuildd.db')
         self.set('build', 'build_more_recent', '1')
-        self.set('build', 'build_arch_any', '1')
+        self.set('build', 'more_archs', 'any')
 
         self.set('mail', 'from', 'rebuildd@localhost')
         self.set('mail', 'mailto', 'rebuildd@localhost')
@@ -77,12 +77,16 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('log', 'mail_failed', '1')
         self.set('log', 'mail_successful', '0')
 
+        self.arch = []
         parch = os.popen("dpkg --print-architecture")
-        self.arch = parch.readline().strip()
+        self.arch.append(parch.readline().strip())
         parch.close()
 
         if not dontparse:
             self.reload()
+
+        for a in self.get('build', 'more_archs').split(' '):
+            self.arch.append(a)
 
     def reload(self):
         """Reload configuration file"""

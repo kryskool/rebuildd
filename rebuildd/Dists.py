@@ -20,7 +20,7 @@ class Dists(object):
     """Singleton implementing a set of Debian distributions"""
 
     _instance = None
-    dists = {}
+    dists = []
  
     def __new__(cls): 
         if cls._instance is None: 
@@ -28,5 +28,10 @@ class Dists(object):
         return cls._instance 
 
     def add_dist(self, dist):
-        self.dists[dist.name] = dist
+        self.dists.append(dist)
 
+    def get_dist(self, name, arch):
+        for d in self.dists:
+            if d.name == name and d.arch == arch:
+                return d
+        return None

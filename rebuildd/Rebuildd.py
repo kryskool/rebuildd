@@ -56,7 +56,8 @@ class Rebuildd(object):
 
         # Create distributions
         for dist in self.cfg.get('build', 'dists').split(' '):
-            Dists().add_dist(Distribution(dist))
+            for arch in self.cfg.arch:
+                Dists().add_dist(Distribution(dist, arch))
 
         self.do_quit = threading.Event()
         self.jobs_locker = threading.Lock()
@@ -126,44 +127,37 @@ class Rebuildd(object):
                 return 0
 
             jobs = []
-            jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch=self.cfg.arch)[:max_new])
-            if self.cfg.getboolean('build', 'build_arch_any'):
-                jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch='any')[:max_new])
+            for arch in self.cfg.arch:
+                jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch=arch)[:max_new])
 
             count_new = 0
             for job in jobs:
                 # Look for higher versions ?
                 if self.cfg.getboolean('build', 'build_more_recent'):
-                    newjob = None
                     packages = Package.selectBy(name=job.package.name)
-
                     candidate_packages = []
                     candidate_packages.extend(packages)
                     candidate_packages.sort(cmp=Package.VersionCompare)
                     candidate_packages.reverse()
+                    newjob = None
 
                     # so there are packages with higher version number
                     # try to see if there's a job for us
                     for cpackage in candidate_packages:
                         candidate_jobs = []
-                        candidate_jobs.extend(Job.selectBy(package=cpackage, arch=self.cfg.arch))
-                        if self.cfg.getboolean('build', 'build_arch_any'):
-                            candidate_jobs.extend(Job.selectBy(package=cpackage, arch='any'))
+                        candidate_jobs.extend(Job.selectBy(package=cpackage, arch=job.arch))
                         for cjob in candidate_jobs:
-                            if newjob and newjob.arch == self.cfg.arch and cjob.arch == self.cfg.arch and cjob.status == JobStatus.WAIT:
+                            if newjob and newjob != cjob and cjob.status == JobStatus.WAIT:
                                 cjob.status = JobStatus.GIVEUP
-                            elif newjob and newjob.arch == "any" and cjob.status == JobStatus.WAIT:
-                                cjob.status = JobStatus.GIVEUP
-                            elif not newjob and cjob.status == JobStatus.WAIT:
+                            elif cjob.status == JobStatus.WAIT:
                                 newjob = cjob
 
                     job = newjob
 
-
                 # We have to check because it might have changed
-                # between our first select and the build_more_recent sfuffs
+                # between our first select and the build_more_recent stuffs
 
-                if job == None or job.status != JobStatus.WAIT:
+                if not job or job.status != JobStatus.WAIT:
                     continue
 
                 job.status = JobStatus.WAIT_LOCKED
@@ -268,11 +262,11 @@ class Rebuildd(object):
     def add_job(self, name, version, priority, dist, mailto=None, arch=None):
         """Add a job"""
 
-        if not Dists().dists.has_key(dist):
-            return False
-
         if not arch:
-            arch = self.cfg.arch
+            arch = self.cfg.arch[0]
+
+        if not Dists().get_dist(dist, arch):
+            return False
 
         pkgs = Package.selectBy(name=name, version=version)
         if pkgs.count():

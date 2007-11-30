@@ -15,12 +15,15 @@ class TestDistribution(unittest.TestCase):
 
     def setUp(self):
         rebuildd_global_test_setup()
-        self.d = Distribution("sid")
+        self.d = Distribution("sid", "alpha")
         self.package = Package(name="xutils", version="7.1.ds.3-1")
         self.package_dotted = Package(name="xutils", version="1:7.1.ds.3-1")
 
     def test_name(self):
         self.assert_(self.d.name is "sid")
+
+    def test_arch(self):
+        self.assert_(self.d.arch is "alpha")
                 
     def test_get_source_cmd(self):
         cmd = self.d.get_source_cmd(self.package)
@@ -31,6 +34,7 @@ class TestDistribution(unittest.TestCase):
     def test_get_build_cmd(self):
         cmd = self.d.get_build_cmd(self.package)
         self.assert_(self.d.name in cmd)
+        self.assert_(self.d.arch in cmd)
         self.assert_(self.package.name in cmd)
         self.assert_(self.package.version in cmd)
         cmd = self.d.get_build_cmd(self.package_dotted)
@@ -40,7 +44,7 @@ class TestDistribution(unittest.TestCase):
         RebuilddConfig().set('build', 'post_build_cmd', '')
         cmd = self.d.get_post_build_cmd(self.package)
         self.assert_(cmd is None)
-        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s %s')
         cmd = self.d.get_post_build_cmd(self.package)
         self.assert_(self.d.name in cmd)
         self.assert_(self.package.name in cmd)

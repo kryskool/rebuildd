@@ -22,8 +22,9 @@ from RebuilddLog import RebuilddLog
 class Distribution(object):
     """Class implementing a Debian distribution"""
 
-    def __init__(self, name):
+    def __init__(self, name, arch):
         self.name = name
+        self.arch = arch
 
     def get_source_cmd(self, package):
         """Return command used for grabing source for this distribution"""
@@ -42,13 +43,13 @@ class Distribution(object):
         try:
             index = package.version.index(":")
             return RebuilddConfig().get('build', 'build_cmd') \
-                    % (self.name, package.name, package.version[index+1:])
+                    % (self.name, self.arch, package.name, package.version[index+1:])
         except ValueError:
             pass
 
         try:
             return RebuilddConfig().get('build', 'build_cmd') \
-                    % (self.name, package.name, package.version)
+                    % (self.name, self.arch, package.name, package.version)
         except TypeError, error:
             RebuilddLog.error("get_build_cmd has invalid format: %s" % error)
             return None
@@ -60,7 +61,7 @@ class Distribution(object):
         if cmd == '':
             return None
         try:
-            return cmd % (self.name, package.name, package.version)
+            return cmd % (self.name, self.arch, package.name, package.version)
         except TypeError, error:
             RebuilddLog.error("post_build_cmd has invalid format: %s" % error)
             return None

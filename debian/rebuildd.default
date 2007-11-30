@@ -21,6 +21,7 @@ PBUILDER_BIN=/usr/sbin/pbuilder
 # PBUILDER_MIRROR=http://ftp.debian.org/debian
 
 # Distributions to generate and manage
+ARCHS="$(dpkg --print-architecture)"
 DISTS="etch lenny sid"
 
 # Set to 1 to enable pbuilder/cowbuilder update in cron
