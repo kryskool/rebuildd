@@ -129,6 +129,9 @@ class RebuilddNetworkClient(threading.Thread):
         if len(args) > 0 and args[0] == "reload":
             return self.exec_cmd_job_reload(*args)
 
+        if len(args) > 0 and args[0] == "status":
+            return self.exec_cmd_job_status(*args)
+
         return "E: usage: job <command> [args]\n"
 
     def exec_cmd_job_add(self, *args):
@@ -185,3 +188,25 @@ class RebuilddNetworkClient(threading.Thread):
         """Load new jobs"""
 
         return "I: %s new jobs added\n" % self.rebuildd.get_new_jobs()
+
+    def exec_cmd_job_status(self, *args):
+        """Dump job status"""
+
+        if len(args) < 2 or len(args) > 5:
+            return "E: usage: job status <name> <ver> <dist> [arch]\n"
+        elif len(args) == 2:
+            jobs = self.rebuildd.get_jobs(name=args[1])
+        elif len(args) == 3:
+            jobs = self.rebuildd.get_jobs(name=args[1],
+                                          version=args[2])
+        elif len(args) == 4:
+            jobs = self.rebuildd.get_jobs(name=args[1],
+                                          version=args[2],
+                                          dist=args[3])
+        elif len(args) == 5:
+            jobs = self.rebuildd.get_jobs(name=args[1],
+                                          version=args[2],
+                                          dist=args[3],
+                                          arch=args[4])
+
+        return self.rebuildd.dump_jobs(jobs)

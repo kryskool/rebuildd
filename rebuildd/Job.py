@@ -243,3 +243,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
             RebuilddLog.error("Unable to send build log mail for job %d: %s" % (self.id, error))
 
         return True
+
+    def __str__(self):
+        return "I: Job %s for %s_%s is status %s on %s/%s for %s" % \
+                (self.id, self.package.name, self.package.version,
+                 JobStatus.whatis(self.status), self.dist, self.arch, self.mailto)

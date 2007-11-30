@@ -208,20 +208,43 @@ class Rebuildd(object):
 
         return jobs_started
 
-    def dump_jobs(self):
+    def get_jobs(self, name, version=None, dist=None, arch=None):
+        """Dump a job status"""
+        
+        if version:
+            pkgs = Package.selectBy(name=name, version=version)
+        else:
+            pkgs = Package.selectBy(name=name)
+
+        if not pkgs.count():
+            return []
+
+        retjobs = []
+        if dist and arch:
+            for pkg in pkgs:
+                retjobs.extend(Job.selectBy(package=pkg, dist=dist, arch=arch))
+        elif dist:
+            for pkg in pkgs:
+                retjobs.extend(Job.selectBy(package=pkg, dist=dist))
+        elif arch:
+            for pkg in pkgs:
+                retjobs.extend(Job.selectBy(package=pkg, arch=arch))
+        else:
+            for pkg in pkgs:
+                retjobs.extend(Job.selectBy(package=pkg))
+        
+        return retjobs
+
+    def dump_jobs(self, joblist=None):
         """Dump all jobs status"""
 
         ret = ""
-        with self.jobs_locker:
-            for job in self.jobs:
-                ret = ret + "I: Job %s for %s_%s is status %s on %s/%s for %s\n" % \
-                            (job.id,
-                             job.package.name,
-                             job.package.version,
-                             JobStatus.whatis(job.status),
-                             job.dist,
-                             job.arch,
-                             job.mailto)
+
+        if not joblist:
+            joblist = self.jobs
+
+        for job in joblist:
+            ret = "%s%s\n" % (ret, str(job))
 
         return ret
 
