@@ -174,7 +174,7 @@ if len(sys.argv) > 1:
     if sys.argv[1] == "add":
         add()
     if sys.argv[1] == "add-quinn-diff" and len(sys.argv) > 2:
-        add_quinn_difF(sys.argv[2])
+        add_quinn_diff(sys.argv[2])
     if sys.argv[1] == "list":
         list()
     if sys.argv[1] == "stats":
