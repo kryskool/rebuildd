@@ -17,6 +17,11 @@
 # 
 
 import sqlobject
+
+# apt warning make me crazzzyyy
+import warnings
+warnings.filterwarnings("ignore", module='apt')
+del warnings
 import apt
 
 class Package(sqlobject.SQLObject): 
