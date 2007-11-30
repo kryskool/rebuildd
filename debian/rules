@@ -5,8 +5,7 @@ DEB_DH_INSTALLINIT_ARGS=--no-restart-on-upgrade
 
 
 ifneq (,$(findstring UNRELEASED,$(shell head -n 1 debian/changelog)))
-	FINALVERSION=$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)
-	VERSION="$(FINALVERSION)-r$(shell svn info -R | grep 'Last Changed Rev' | cut -d' ' -f4 | sort -rn | head -n 1)"
+	VERSION="$(shell git describe 2>/dev/null || echo devel)"
 else
 	VERSION=$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)
 endif
