@@ -127,8 +127,8 @@ class Rebuildd(object):
                 return 0
 
             jobs = []
-            for arch in self.cfg.arch:
-                jobs.extend(Job.selectBy(status=JobStatus.WAIT, arch=arch)[:max_new])
+            for dist in Dists().dists: 
+                jobs.extend(Job.selectBy(status=JobStatus.WAIT, dist=dist.name, arch=dist.arch)[:max_new])
 
             count_new = 0
             for job in jobs:
@@ -145,7 +145,7 @@ class Rebuildd(object):
                     # try to see if there's a job for us
                     for cpackage in candidate_packages:
                         candidate_jobs = []
-                        candidate_jobs.extend(Job.selectBy(package=cpackage, arch=job.arch))
+                        candidate_jobs.extend(Job.selectBy(package=cpackage, dist=job.dist, arch=job.arch))
                         for cjob in candidate_jobs:
                             if newjob and newjob != cjob and cjob.status == JobStatus.WAIT:
                                 cjob.status = JobStatus.GIVEUP
