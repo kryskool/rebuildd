@@ -245,6 +245,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
         return True
 
     def __str__(self):
-        return "I: Job %s for %s_%s is status %s on %s/%s for %s" % \
-                (self.id, self.package.name, self.package.version,
-                 JobStatus.whatis(self.status), self.dist, self.arch, self.mailto)
+        return "I: Job %s for %s_%s is status %s on %s for %s/%s" % \
+                (self.id, self.package.name, self.package.version, self.host,
+                 JobStatus.whatis(self.status), self.dist, self.arch)

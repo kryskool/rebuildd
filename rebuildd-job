@@ -154,17 +154,17 @@ def delete(jobid):
         print "E: can't delete job, build status is %s and should be WAIT" % job.status
 
 def print_headers():
-    print "  id  |     package name     |    version     |    status    |  dist  |  arch  "
-    print "------+----------------------+----------------+--------------+--------+--------"
+    print "  id  |     package name     |    version     |    status    |  host  | dist  |  arch  "
+    print "------+----------------------+----------------+--------------+--------+-------+--------"
 
 def print_jobs(jobs):
     try:
         print_headers()
         for job in jobs:
-            print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %06.6s" % \
+            print "%05.5s | %020.20s | %014.14s | %012.12s | %06.6s | %05.5s | %06.6s" % \
                     (job.id, job.package.name, job.package.version,
                      JobStatus.whatis(job.status),
-                     job.dist, job.arch)
+                     job.host, job.dist, job.arch)
     except IOError:
         pass
 
