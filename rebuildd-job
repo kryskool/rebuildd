@@ -88,6 +88,9 @@ def list():
     if critname == "dist":
         print_jobs(Job.selectBy(dist=critvalue))
 
+    if critname == "host":
+        print_jobs(Job.selectBy(host=critvalue))
+
     if critname == "status":
         try:
             print_jobs(Job.selectBy(status=getattr(JobStatus, critvalue)))
