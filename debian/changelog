@@ -1,4 +1,4 @@
-rebuildd (0.3.0) UNRELEASED; urgency=low
+rebuildd (0.3.0) unstable; urgency=low
 
   * Store timestamp of changed status
   * Add 'build_more_recent' option, to build only the
