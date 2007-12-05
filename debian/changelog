@@ -1,3 +1,9 @@
+rebuildd (0.3.1) UNRELEASED; urgency=low
+
+  * Fix maintenance script for $arch support
+
+ -- Julien Danjou <acid@debian.org>  Wed, 05 Dec 2007 08:17:29 +0100
+
 rebuildd (0.3.0) unstable; urgency=low
 
   * Store timestamp of changed status

@@ -27,7 +27,10 @@ function pbuilder_update
         echo "I: Updating pbuilder for $DISTS"
         for d in $DISTS
         do
-            $PBUILDER_BIN update --basetgz $PBUILDER_CACHE_PATH/${d}.tgz --distribution $d --mirror $PBUILDER_MIRROR
+            for a in $ARCHS
+            do
+                $PBUILDER_BIN update --basetgz $PBUILDER_CACHE_PATH/${d}-${a}.tgz
+            done
         done
 }
 
@@ -43,7 +46,10 @@ function cowbuilder_update
         echo "I: Updating cowbuilder for $DISTS"
         for d in $DISTS
         do
-            $COWBUILDER_BIN --update --basepath $PBUILDER_CACHE_PATH/${d}.cow --distribution $d --mirror $PBUILDER_MIRROR
+            for a in $ARCHS
+            do
+                $COWBUILDER_BIN --update --basepath $PBUILDER_CACHE_PATH/${d}-${a}.cow
+            done
         done
 }
 
