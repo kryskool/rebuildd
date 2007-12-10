@@ -14,7 +14,7 @@ then
     . /etc/default/rebuildd
 fi
 
-function pbuilder_create
+pbuilder_create ()
 {
         if [ ! -x "$PBUILDER_BIN" ]
         then
@@ -35,7 +35,7 @@ function pbuilder_create
 }
 
 
-function cowbuilder_create
+cowbuilder_create ()
 {
         if [ ! -x "$COWBUILDER_BIN" ]
         then
