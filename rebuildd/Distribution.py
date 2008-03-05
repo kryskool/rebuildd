@@ -18,9 +18,18 @@
 
 from RebuilddConfig import RebuilddConfig
 from RebuilddLog import RebuilddLog
+from string import Template
 
 class Distribution(object):
-    """Class implementing a Debian distribution"""
+    """Class implementing a Debian distribution
+
+    Substitutions are done in the command strings:
+
+      $d => The distro's name
+      $a => the target architecture
+      $p => the package's name
+      $v => the package's version
+    """
 
     def __init__(self, name, arch):
         self.name = name
@@ -30,8 +39,10 @@ class Distribution(object):
         """Return command used for grabing source for this distribution"""
 
         try:
-            return RebuilddConfig().get('build', 'source_cmd') \
-                    % (self.name, package.name, package.version)
+	    args = { 'd': self.name, 'a': self.arch, 'v': package.version, \
+                'p': package.name }
+            t = Template(RebuilddConfig().get('build', 'source_cmd'))
+	    return t.safe_substitute(**args)
         except TypeError, error:
             RebuilddLog.error("get_source_cmd has invalid format: %s" % error)
             return None
@@ -42,14 +53,18 @@ class Distribution(object):
         # Strip epochs (x:) away
         try:
             index = package.version.index(":")
-            return RebuilddConfig().get('build', 'build_cmd') \
-                    % (self.name, self.arch, package.name, package.version[index+1:])
+            args = { 'd': self.name, 'a': self.arch, \
+                'v': package.version[index+1:], 'p': package.name }
+            t = Template(RebuilddConfig().get('build', 'build_cmd'))
+	    return t.safe_substitute(**args)
         except ValueError:
             pass
 
         try:
-            return RebuilddConfig().get('build', 'build_cmd') \
-                    % (self.name, self.arch, package.name, package.version)
+            args = { 'd': self.name, 'a': self.arch, \
+                'v': package.version, 'p': package.name }
+            t = Template(RebuilddConfig().get('build', 'build_cmd'))
+	    return t.safe_substitute(**args)
         except TypeError, error:
             RebuilddLog.error("get_build_cmd has invalid format: %s" % error)
             return None
@@ -61,7 +76,10 @@ class Distribution(object):
         if cmd == '':
             return None
         try:
-            return cmd % (self.name, self.arch, package.name, package.version)
+            args = { 'd': self.name, 'a': self.arch, \
+                'v': package.version, 'p': package.name }
+            t = Template(cmd)
+	    return t.safe_substitute(**args)
         except TypeError, error:
             RebuilddLog.error("post_build_cmd has invalid format: %s" % error)
             return None
