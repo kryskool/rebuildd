@@ -1,3 +1,12 @@
+rebuildd (0.3.2) unstable; urgency=low
+
+  * Set ip to 127.0.0.1 by default for obvious security reason
+  * Fix bashisms in rebuildd-init-build-system (Closes: #455371)
+  * Bump standard version
+  * Fix dependency since python 2.5 is not default
+
+ -- Julien Danjou <acid@debian.org>  Thu, 17 Apr 2008 11:35:22 +0200
+
 rebuildd (0.3.1) unstable; urgency=low
 
   * Fix maintenance script for $arch support

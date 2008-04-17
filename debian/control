@@ -2,8 +2,8 @@ Source: rebuildd
 Section: devel
 Priority: extra
 Maintainer: Julien Danjou <acid@debian.org>
-Build-Depends: cdbs, debhelper (>= 5), python2.5, python-support, xsltproc, docbook-xsl, python-sqlobject, python-apt
-Standards-Version: 3.7.2
+Build-Depends: cdbs, debhelper (>= 5), python (>= 2.5), python-support, xsltproc, docbook-xsl, python-sqlobject, python-apt
+Standards-Version: 3.7.3
 
 Package: rebuildd
 Architecture: all
@@ -21,3 +21,6 @@ Description: build daemon aiming at rebuilding Debian packages
  It is also administrable via a telnet interface. A Web interface is also 
  embedded so you can see your jobs queue and watch log file in real-time in your
  browser.
+ .
+ rebuildd is designed to be run on multiple hosts even with different
+ architecture set, and to parallelize the rebuild tasks.
