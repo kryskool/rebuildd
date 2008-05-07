@@ -1,3 +1,9 @@
+rebuildd (0.3.3) unstable; urgency=low
+
+  * Switch to python2.5 which is now default
+
+ -- Julien Danjou <acid@debian.org>  Wed, 07 May 2008 13:42:28 +0200
+
 rebuildd (0.3.2) unstable; urgency=low
 
   * Set ip to 127.0.0.1 by default for obvious security reason

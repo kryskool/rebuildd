@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/python
 #
 # rebuildd - Debian packages rebuild tool
 #

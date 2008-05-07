@@ -25,7 +25,7 @@ build-stamp-rebuildd:
 install/rebuildd::
 	install -d debian/rebuildd/usr/sbin
 	install -m 0755 rebuildd.py debian/rebuildd/usr/sbin/rebuildd
-	sed -i "s,^__version__.*$=,__version__ = \"$(VERSION)\"," debian/rebuildd/usr/lib/python2.5/site-packages/rebuildd/*.py
+	sed -i "s,^__version__.*$=,__version__ = \"$(VERSION)\"," debian/rebuildd/usr/lib/python*/site-packages/rebuildd/*.py
 	dh_installinit --name=rebuildd-httpd $(DEB_DH_INSTALLINIT_ARGS)
 
 cleanbuilddir/rebuildd::
