@@ -37,7 +37,7 @@ class RequestIndex:
     def GET(self):
         print render.base(page=render.index(), \
                 hostname=socket.gethostname(), \
-                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                archs=RebuilddConfig().arch, \
                 dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestPackage:
@@ -58,7 +58,7 @@ class RequestPackage:
                 hostname=socket.gethostname(), \
                 title=title, \
                 package=package, \
-                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                archs=RebuilddConfig().arch, \
                 dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestArch:
@@ -72,7 +72,7 @@ class RequestArch:
                 dist=dist, \
                 title="%s/%s" % (dist, arch), \
                 hostname=socket.gethostname(), \
-                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                archs=RebuilddConfig().arch, \
                 dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestJob:
@@ -89,7 +89,7 @@ class RequestJob:
         print render.base(page=render.job(job=job, build_log=build_log), \
                 hostname=socket.gethostname(), \
                 title="job %s" % job.id, \
-                archs=RebuilddConfig().get('build', 'archs').split(' '), \
+                archs=RebuilddConfig().arch, \
                 dists=RebuilddConfig().get('build', 'dists').split(' '))
 
 class RequestGraph:
