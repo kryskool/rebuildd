@@ -20,6 +20,10 @@ PBUILDER_BIN=/usr/sbin/pbuilder
 # Default Debian mirror
 # PBUILDER_MIRROR=http://ftp.debian.org/debian
 
+# Pass other options to pbuilder
+# PBUILDER_OTHER_OPTIONS[0]="--components=main contrib"
+# PBUILDER_OTHER_OPTIONS[1]="--othermirror=deb http://my.apt.repo sid main"
+
 # Distributions to generate and manage
 ARCHS="$(dpkg --print-architecture)"
 DISTS="etch lenny sid"

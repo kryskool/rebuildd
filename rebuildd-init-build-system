@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # Exit on errors
 set -e
@@ -7,6 +7,7 @@ set -e
 PBUILDER_BIN="/usr/sbin/pbuilder"
 PBUILDER_CACHE_PATH="/var/cache/pbuilder"
 PBUILDER_MIRROR="http://ftp.debian.org/debian"
+PBUILDER_OTHER_OPTIONS=()
 
 if [ -f /etc/default/rebuildd ]
 then
@@ -27,7 +28,7 @@ pbuilder_create ()
             for a in $ARCHS
             do
                 echo "I: Initializing pbuilder for ${d}-${a}"
-                $PBUILDER_BIN create --debootstrapopts --arch=$a --basetgz $PBUILDER_CACHE_PATH/${d}-${a}.tgz --distribution $d --mirror $PBUILDER_MIRROR
+                $PBUILDER_BIN create --debootstrapopts --arch=$a --basetgz $PBUILDER_CACHE_PATH/${d}-${a}.tgz --distribution $d --mirror $PBUILDER_MIRROR "${PBUILDER_OTHER_OPTIONS[@]}"
             done
         done
         echo "I: Init done, please remember to set rebuildd configuration to the correct value:"
@@ -48,7 +49,7 @@ cowbuilder_create ()
             for a in $ARCHS
             do
                 echo "I: Initializing cowbuilder for ${d}-${a}"
-                $COWBUILDER_BIN --create --debootstrapopts --arch=$a --basepath $PBUILDER_CACHE_PATH/${d}-${a}.cow --distribution $d --mirror $PBUILDER_MIRROR
+                $COWBUILDER_BIN --create --debootstrapopts --arch=$a --basepath $PBUILDER_CACHE_PATH/${d}-${a}.cow --distribution $d --mirror $PBUILDER_MIRROR "${PBUILDER_OTHER_OPTIONS[@]}"
             done
         done
 
