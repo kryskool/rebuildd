@@ -14,7 +14,7 @@ START_REBUILDD_HTTPD=0
 PBUILDER_BIN=/usr/sbin/pbuilder
 #COWBUILDER_BIN=/usr/sbin/cowbuilder
 
-# Specift cache path
+# Specify cache path
 # PBUILDER_CACHE_PATH="/var/cache/pbuilder"
 
 # Default Debian mirror
