@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 # rebuildd-httpd init script
 #
 ### BEGIN INIT INFO
