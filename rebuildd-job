@@ -154,7 +154,7 @@ def delete(jobid):
         else:
             print "E: unable to delete job"
     else:
-        print "E: can't delete job, build status is %s and should be WAIT" % job.status
+        print "E: can't delete job, build status is %s and should be WAIT" % JobStatus.whatis(job.status)
 
 def print_headers():
     print "  id  |     package name     |    version     |    status    |  host  | dist  |  arch  "
