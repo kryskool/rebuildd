@@ -35,7 +35,7 @@ render = web.template.render(RebuilddConfig().get('http', 'templates_dir'), \
 class RequestIndex:
 
     def GET(self):
-        print render.base(page=render.index(), \
+        return render.base(page=render.index(), \
                 hostname=socket.gethostname(), \
                 archs=RebuilddConfig().arch, \
                 dists=RebuilddConfig().get('build', 'dists').split(' '))
@@ -54,7 +54,7 @@ class RequestPackage:
             title = package = name
 
         jobs.extend(Job.selectBy(package=pkg))
-        print render.base(page=render.tab(jobs=jobs), \
+        return render.base(page=render.tab(jobs=jobs), \
                 hostname=socket.gethostname(), \
                 title=title, \
                 package=package, \
@@ -67,7 +67,7 @@ class RequestArch:
         jobs = []
         jobs.extend(Job.select(sqlobject.AND(Job.q.arch == arch, Job.q.dist == dist),
             orderBy=sqlobject.DESC(Job.q.creation_date))[:10])
-        print render.base(page=render.tab(jobs=jobs), \
+        return render.base(page=render.tab(jobs=jobs), \
                 arch=arch, \
                 dist=dist, \
                 title="%s/%s" % (dist, arch), \
@@ -86,7 +86,7 @@ class RequestJob:
         except IOError, error:
             build_log = "No build log available"
 
-        print render.base(page=render.job(job=job, build_log=build_log), \
+        return render.base(page=render.job(job=job, build_log=build_log), \
                 hostname=socket.gethostname(), \
                 title="job %s" % job.id, \
                 archs=RebuilddConfig().arch, \
@@ -141,7 +141,7 @@ class RequestGraph:
         tmp = tempfile.TemporaryFile()
         graph.draw(tmp)
         tmp.seek(0)
-        print tmp.read()
+        return tmp.read()
 
     def GET_package(self, package=None):
         graph = self.graph_init()
@@ -158,7 +158,7 @@ class RequestGraph:
         tmp = tempfile.TemporaryFile()
         graph.draw(tmp)
         tmp.seek(0)
-        print tmp.read()
+        return tmp.read()
 
 class RebuilddHTTPServer:
     """Main HTTP server"""
@@ -180,6 +180,9 @@ class RebuilddHTTPServer:
         """Run main HTTP server thread"""
 
         web.webapi.internalerror = web.debugerror
-        web.httpserver.runsimple(web.webapi.wsgifunc(web.webpyfunc(self.urls, globals(), False)),
-                                 (RebuilddConfig().get('http', 'ip'),
-                                  RebuilddConfig().getint('http', 'port')))
+
+        import sys; sys.argv.append(RebuilddConfig().get('http', 'ip') + ":" + RebuilddConfig().get('http', 'port'))
+
+	app = web.application(self.urls, globals())
+	app.run()
+
