@@ -16,7 +16,7 @@ fi
 
 test "$ENABLE_BUILDER_MAINT" = 0 && exit 0
 
-function pbuilder_update
+pbuilder_update()
 {
         if [ ! -x "$PBUILDER_BIN" ]
         then
@@ -35,7 +35,7 @@ function pbuilder_update
 }
 
 
-function cowbuilder_update
+cowbuilder_update()
 {
         if [ ! -x "$COWBUILDER_BIN" ]
         then
