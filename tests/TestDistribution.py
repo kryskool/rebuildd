@@ -26,12 +26,14 @@ class TestDistribution(unittest.TestCase):
         self.assert_(self.d.arch is "alpha")
                 
     def test_get_source_cmd(self):
+        RebuilddConfig().set('build', 'source_cmd', '/bin/true $d $a $p $v')
         cmd = self.d.get_source_cmd(self.package)
         self.assert_(self.d.name in cmd)
         self.assert_(self.package.name in cmd)
         self.assert_(self.package.version in cmd)
 
     def test_get_build_cmd(self):
+        RebuilddConfig().set('build', 'build_cmd', '/bin/true $d $a $p $v')
         cmd = self.d.get_build_cmd(self.package)
         self.assert_(self.d.name in cmd)
         self.assert_(self.d.arch in cmd)
@@ -44,16 +46,11 @@ class TestDistribution(unittest.TestCase):
         RebuilddConfig().set('build', 'post_build_cmd', '')
         cmd = self.d.get_post_build_cmd(self.package)
         self.assert_(cmd is None)
-        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s %s')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true $d $a $p $v')
         cmd = self.d.get_post_build_cmd(self.package)
         self.assert_(self.d.name in cmd)
         self.assert_(self.package.name in cmd)
         self.assert_(self.package.version in cmd)
-
-    def test_invalid_get_post_build_cmd(self):
-        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true')
-        cmd = self.d.get_post_build_cmd(self.package)
-        self.assert_(cmd is None)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDistribution)

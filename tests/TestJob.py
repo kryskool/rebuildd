@@ -43,18 +43,18 @@ class TestJob(unittest.TestCase):
 
     def test_build_success(self):
         self.job.do_quit.clear()
-        RebuilddConfig().set('build', 'source_cmd', '/bin/true %s %s %s')
-        RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s %s')
-        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s %s')
+        RebuilddConfig().set('build', 'source_cmd', '/bin/true')
+        RebuilddConfig().set('build', 'build_cmd', '/bin/true')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true')
         self.job.start()
         self.job.join()
         self.assert_(self.job.status == JobStatus.BUILD_OK)
 
     def test_build_failure_source(self):
         self.job.do_quit.clear()
-        RebuilddConfig().set('build', 'source_cmd', '/bin/false %s %s %s')
-        RebuilddConfig().set('build', 'build_cmd', '/bin/true %s %s %s %s')
-        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true %s %s %s %s')
+        RebuilddConfig().set('build', 'source_cmd', '/bin/false')
+        RebuilddConfig().set('build', 'build_cmd', '/bin/true')
+        RebuilddConfig().set('build', 'post_build_cmd', '/bin/true')
         self.job.start()
         self.job.join()
         self.assert_(self.job.status == JobStatus.SOURCE_FAILED)
