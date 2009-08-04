@@ -3,8 +3,9 @@ rebuildd (0.3.6) unstable; urgency=low
   * Fix bug with new webpy in rebuildd-httpd (Closes: #536372)
   * Fix bashisms in maintenance script (Closes: #530179)
   * Add homepage (Closes: #529714)
+  * Bump standard version
 
- -- Julien Danjou <acid@debian.org>  Tue, 04 Aug 2009 12:30:31 +0200
+ -- Julien Danjou <acid@debian.org>  Tue, 04 Aug 2009 12:34:53 +0200
 
 rebuildd (0.3.5) unstable; urgency=low
 

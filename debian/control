@@ -3,7 +3,7 @@ Section: devel
 Priority: extra
 Maintainer: Julien Danjou <acid@debian.org>
 Build-Depends: cdbs, debhelper (>= 5), python (>= 2.5), python-support, xsltproc, docbook-xsl, python-sqlobject, python-apt
-Standards-Version: 3.8.0
+Standards-Version: 3.8.2
 Homepage: http://julien.danjou.info/rebuildd
 
 Package: rebuildd
