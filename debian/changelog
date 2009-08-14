@@ -1,3 +1,9 @@
+rebuildd (0.3.7) unstable; urgency=low
+
+  * Fix incorrect dependencies on init script (Closes: #541546)
+
+ -- Julien Danjou <acid@debian.org>  Wed, 18 Nov 2009 20:10:40 +0100
+
 rebuildd (0.3.6) unstable; urgency=low
 
   * Fix bug with new webpy in rebuildd-httpd (Closes: #536372)

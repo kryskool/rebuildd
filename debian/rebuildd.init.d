@@ -3,10 +3,10 @@
 #
 ### BEGIN INIT INFO
 # Provides:          rebuildd
-# Required-Start:
-# Required-Stop:
-# Should-Start:      $local_fs $network
-# Should-Stop:       $local_fs $network
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Should-Start:      $network
+# Should-Stop:       $network
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: rebuild daemon
