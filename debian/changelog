@@ -2,6 +2,7 @@ rebuildd (0.3.7) unstable; urgency=low
 
   * Fix incorrect dependencies on init script (Closes: #541546)
   * Add missing entry in rebuildd-job manpage (Closes: #553421)
+  * Bump standard version
 
  -- Julien Danjou <acid@debian.org>  Wed, 18 Nov 2009 20:17:47 +0100
 
