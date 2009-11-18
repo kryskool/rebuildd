@@ -70,6 +70,23 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>add-quinn-diff [distribution]</option>
+        </term>
+        <listitem>
+            <para>Add jobs to the database. Job list is read from stdin.
+                The input format is expected to be the same as quinn-diff.
+                Distribution has to be specified as argument.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>delete [jobid]</option>
+        </term>
+        <listitem>
+            <para>Delete a job from the database.
+                The job id has to be provided as argument.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>list [crit=value]</option>
         </term>
         <listitem>
