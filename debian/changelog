@@ -2,8 +2,9 @@ rebuildd (0.3.8) unstable; urgency=low
 
   * Fix rebuildd-init-build-system advices on build_cmd
     (Closes: #561926)
+  * Bump standard version
 
- -- Julien Danjou <acid@debian.org>  Mon, 08 Feb 2010 14:47:14 +0100
+ -- Julien Danjou <acid@debian.org>  Mon, 08 Feb 2010 14:49:01 +0100
 
 rebuildd (0.3.7) unstable; urgency=low
 
