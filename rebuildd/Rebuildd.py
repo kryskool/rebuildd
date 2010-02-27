@@ -137,7 +137,7 @@ class Rebuildd(object):
                     packages = Package.selectBy(name=job.package.name)
                     candidate_packages = []
                     candidate_packages.extend(packages)
-                    candidate_packages.sort(cmp=Package.VersionCompare)
+                    candidate_packages.sort(cmp=Package.version_compare)
                     candidate_packages.reverse()
                     newjob = None
 

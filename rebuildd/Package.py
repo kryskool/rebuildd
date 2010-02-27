@@ -18,11 +18,8 @@
 
 import sqlobject
 
-# apt warning make me crazzzyyy
-import warnings
-warnings.filterwarnings("ignore", module='apt')
-del warnings
-import apt
+import apt_pkg
+apt_pkg.init_system()
 
 class Package(sqlobject.SQLObject): 
     """Class implemeting a Debian package""" 
@@ -32,5 +29,5 @@ class Package(sqlobject.SQLObject):
     priority = sqlobject.StringCol(default=None)
 
     @staticmethod
-    def VersionCompare(a, b):
-        return apt.VersionCompare(a.version, b.version)
+    def version_compare(a, b):
+        return apt_pkg.version_compare(a.version, b.version)
