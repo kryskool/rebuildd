@@ -1,3 +1,9 @@
+rebuildd (0.3.9) unstable; urgency=low
+
+  * Update for python-apt API transition (Closes: #571767)
+
+ -- Julien Danjou <acid@debian.org>  Tue, 02 Mar 2010 13:56:27 +0100
+
 rebuildd (0.3.8) unstable; urgency=low
 
   * Fix rebuildd-init-build-system advices on build_cmd
