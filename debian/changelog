@@ -1,3 +1,9 @@
+rebuildd (0.3.10) unstable; urgency=low
+
+  * Do not raise string exceptions (Closes: #585348)
+
+ -- Julien Danjou <acid@debian.org>  Thu, 10 Jun 2010 12:32:01 +0200
+
 rebuildd (0.3.9) unstable; urgency=low
 
   * Update for python-apt API transition (Closes: #571767)

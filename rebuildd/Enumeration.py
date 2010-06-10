@@ -20,7 +20,7 @@ import types
 
 class Enumeration: 
     """Simple enumeration class with reverse lookup""" 
- 
+
     def __init__(self, enumlist): 
         self.lookup = { } 
         self.reverse_lookup = { } 
@@ -29,23 +29,23 @@ class Enumeration:
             if type(elem) == types.TupleType: 
                 elem, val = elem 
             if type(elem) != types.StringType: 
-                raise "enum name is not a string: " + elem 
+                raise ValueError("enum name is not a string: " + elem)
             if type(val) != types.IntType: 
-                raise "enum value is not an integer: " + val 
+                raise ValueError("enum value is not an integer: " + val)
             if self.lookup.has_key(elem): 
-                raise "enum name is not unique: " + elem 
+                raise ValueError("enum name is not unique: " + elem)
             if val in self.lookup.values(): 
-                raise "enum value is not unique for " + val 
+                raise ValueError("enum value is not unique for " + val)
             self.lookup[elem] = val 
             self.reverse_lookup[val] = elem 
             val += 1 
- 
+
     def __getattr__(self, attr): 
         if not self.lookup.has_key(attr): 
             raise AttributeError 
         return self.lookup[attr] 
- 
+
     def whatis(self, value): 
         """Return element name for a value""" 
- 
+
         return self.reverse_lookup[value]
