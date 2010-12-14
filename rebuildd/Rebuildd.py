@@ -160,6 +160,10 @@ class Rebuildd(object):
                 if not job or job.status != JobStatus.WAIT:
                     continue
 
+		# Check dependencies
+		if not job.is_allowed_to_build():
+		    continue
+
                 job.status = JobStatus.WAIT_LOCKED
                 job.host = socket.gethostname()
                 self.jobs.append(job)
@@ -313,6 +317,24 @@ class Rebuildd(object):
         RebuilddLog.info("Added job for %s_%s on %s/%s for %s" \
                       % (name, version, dist, arch, mailto))
         return True
+
+    def add_deps(self, job_id, dependency_ids):
+
+        if Job.selectBy(id=job_id).count() == 0:
+	   RebuilddLog.error("There is no job related to %s that is in the job list" % job_id)
+	   return False
+	job = Job.selectBy(id=job_id)[0]
+
+	deps = []
+	for dep in dependency_ids:
+	    if Job.selectBy(id=dep).count() == 0:
+		RebuilddLog.error("There is no job related to %s that is in the job list" % dep)
+		return False
+	    dep_job = Job.selectBy(id=dep)[0]
+	    deps.append(dep_job)
+
+	job.add_deps(deps)
+	return True
 
     def clean_jobs(self):
         """Clean finished or canceled jobs"""

@@ -70,6 +70,14 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>add-deps</option>
+        </term>
+        <listitem>
+            <para>Add dependencies between jobs. Dependencies are read from stdin, with the following
+            format: job_id dependency_job_id [dependency_job_id] [...]</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>add-quinn-diff [distribution]</option>
         </term>
         <listitem>

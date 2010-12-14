@@ -42,6 +42,7 @@ class Job(threading.Thread, sqlobject.SQLObject):
     build_start = sqlobject.DateTimeCol(default=None)
     build_end = sqlobject.DateTimeCol(default=None)
     host = sqlobject.StringCol(default=None)
+    deps = sqlobject.RelatedJoin('Job', joinColumn='joba', otherColumn='jobb')
     notify = None
 
     def __init__(self, *args, **kwargs):
@@ -248,3 +249,27 @@ class Job(threading.Thread, sqlobject.SQLObject):
         return "I: Job %s for %s_%s is status %s on %s for %s/%s" % \
                 (self.id, self.package.name, self.package.version, self.host,
                  JobStatus.whatis(self.status), self.dist, self.arch)
+
+    def is_allowed_to_build(self):
+        """ Check if job is allowed to build """
+
+	for dep in Job.selectBy(id=self)[0].deps:
+	    if Job.selectBy(id=dep)[0].status != JobStatus.BUILD_OK:
+		return False
+	return True
+
+    def add_dep(self, dep):
+	"""Add a job dependency on another job"""
+
+	for existing_dep in self.deps:
+	    if existing_dep.id == dep.id:
+		RebuilddLog.error("Already existing dependency between job %s and job %s" % (self.id, dep.id))
+		return
+	self.addJob(dep)
+	RebuilddLog.info("Dependency added between job %s and job %s" % (self.id, dep.id))
+
+    def add_deps(self,deps):
+	""" Add several job dependency on another job"""
+
+	for dep in deps:
+	    self.add_dep(dep)

@@ -120,6 +120,9 @@ class RebuilddNetworkClient(threading.Thread):
         if len(args) > 0 and args[0] == "add":
             return self.exec_cmd_job_add(*args)
 
+        if len(args) > 0 and args[0] == "deps":
+            return self.exec_cmd_job_deps(*args)
+
         if len(args) > 0 and args[0] == "cancel":
             return self.exec_cmd_job_cancel(*args)
 
@@ -165,6 +168,22 @@ class RebuilddNetworkClient(threading.Thread):
         if ret:
             return "I: job added\n"
         return "E: error adding job\n"
+
+
+    def exec_cmd_job_deps(self, *args):
+        """Add dependency"""
+
+        ret = False
+        if len(args) < 2:
+            return "E: usage: job deps <job_id> <dependency_job_id> [dependency_job_id] [...]\n"
+
+	ret = self.rebuildd.add_deps(job_id=args[1],
+				    dependency_ids=args[2:])
+
+	if ret:
+	    return "I: Dependency added\n"
+	return "E: error adding deps"
+
 
     def exec_cmd_job_cancel(self, *args):
         """Cancel job"""

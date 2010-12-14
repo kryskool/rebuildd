@@ -30,11 +30,37 @@ def usage():
     print "Usage: %s [command] <opts>\n" % os.path.basename(sys.argv[0])
     print "Commands:"
     print "   add                     - add jobs, reading from stdin"
+    print "   add-deps                - add build-depends, reading from stdin"
     print "   add-quinn-diff <dist>   - add package reading quinn-diff input from stdin"
     print "   delete <jobid>          - delete job"
+    print "   list-deps               - list the whole depends table"
     print "   list <criteria>=<value> - list jobs matching criteria"
     print "   stats                   - view a nice graph of build status"
     sys.exit(1)
+
+def add_deps():
+    empty = True
+    for line in sys.stdin.readlines():
+        empty = False
+        args = line.strip().split(' ')
+        Rebuildd().add_deps(job_id=args[0], dependency_ids=args[1:])
+
+    if empty:
+        print "E: usage: %s\n   read <job_id> <dependency_job_id> [dependency_job_id] [...] from stdin" % sys.argv[0]
+        sys.exit(1)
+
+def dep_list_to_string(job_list):
+    output_string = ""
+    for job in job_list:
+	output_string = output_string + " " + str(job.id)
+    return output_string
+
+def display_dep():
+    jobs = Job.selectBy()
+    print "  id  |    dependencies     "
+    print "------+----------------------"
+    for job in jobs:
+        print "%04.4s | %021.21s" % (job.id, dep_list_to_string(job.deps))
 
 def add():
     empty = True
@@ -176,6 +202,10 @@ if len(sys.argv) > 1:
     Rebuildd()
     if sys.argv[1] == "add":
         add()
+    if sys.argv[1] == "add-deps":
+        add_deps()
+    if sys.argv[1] == "list-deps":
+        display_dep()
     if sys.argv[1] == "add-quinn-diff" and len(sys.argv) > 2:
         add_quinn_diff(sys.argv[2])
     if sys.argv[1] == "list":
