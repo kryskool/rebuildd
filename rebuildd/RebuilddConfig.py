@@ -48,7 +48,7 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('build', 'source_cmd', 'apt-get -q --download-only -t ${d} source ${p}=${v}')
         self.set('build', 'build_cmd', 'pbuilder build --basetgz /var/cache/pbuilder/${d}-${a}.tgz ${p}_${v}.dsc')
         self.set('build', 'post_build_cmd', '')
-        self.set('build', 'dists', 'etch lenny sid')
+        self.set('build', 'dists', 'squeeze wheezy sid')
         self.set('build', 'work_dir', '/var/cache/rebuildd/build')
         self.set('build', 'database_uri', 'sqlite:///var/lib/rebuildd/rebuildd.db')
         self.set('build', 'build_more_recent', '1')
