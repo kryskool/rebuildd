@@ -57,6 +57,8 @@ class RebuilddConfig(object, ConfigParser.ConfigParser):
         self.set('mail', 'from', 'rebuildd@localhost')
         self.set('mail', 'mailto', 'rebuildd@localhost')
         self.set('mail', 'subject_prefix', '[rebuildd]')
+        self.set('mail', 'smtp_host', 'localhost')
+        self.set('mail', 'smtp_port', '25')
 
         self.set('telnet', 'port', '9999')
         self.set('telnet', 'ip', '127.0.0.1')

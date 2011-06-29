@@ -231,7 +231,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         try:
             smtp = smtplib.SMTP()
-            smtp.connect()
+            smtp.connect(RebuilddConfig().get('mail', 'smtp_host'),
+                         RebuilddConfig().get('mail', 'smtp_port'))
             if self.mailto:
                 smtp.sendmail(RebuilddConfig().get('mail', 'from'),
                               self.mailto,

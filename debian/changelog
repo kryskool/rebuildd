@@ -1,3 +1,9 @@
+rebuildd (0.3.11) unstable; urgency=low
+
+  * Make SMTP host configurable (Closes: #570426)
+
+ -- Julien Danjou <acid@debian.org>  Wed, 29 Jun 2011 16:13:22 +0200
+
 rebuildd (0.3.10) unstable; urgency=low
 
   * Do not raise string exceptions (Closes: #585348)
