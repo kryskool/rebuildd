@@ -1,6 +1,7 @@
 rebuildd (0.3.11) unstable; urgency=low
 
   * Make SMTP host configurable (Closes: #570426)
+  * Use bash to call 00_update_build_system (Closes: #632055)
 
  -- Julien Danjou <acid@debian.org>  Wed, 29 Jun 2011 16:13:22 +0200
 
