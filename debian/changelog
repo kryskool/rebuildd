@@ -1,3 +1,10 @@
+rebuildd (0.4-1) unstable; urgency=low
+
+  * Bump version to indicate schema change and add a note in NEWS.Debian
+    (Closes: #632525)
+
+ -- Julien Danjou <acid@debian.org>  Wed, 05 Oct 2011 16:05:47 +0200
+
 rebuildd (0.3.11) unstable; urgency=low
 
   * Make SMTP host configurable (Closes: #570426)

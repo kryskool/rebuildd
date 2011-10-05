@@ -1,0 +1,8 @@
+rebuildd (0.3.11-1) unstable; urgency=low
+
+  The schema changed between 0.3.10 and 0.3.11. You will need to either
+  manually convert the existing build status database to the new schema (no
+  documentation provided, read the source) or start fresh with "rebuildd
+  init".
+
+ -- Julien Danjou <acid@debian.org>  Wed, 05 Oct 2011 18:50:08 +0100
