@@ -23,7 +23,7 @@ from __future__ import with_statement
 from Enumeration import Enumeration
 from Distribution import Distribution
 from Dists import Dists
-from RebuilddLog import RebuilddLog
+from RebuilddLog import RebuilddLog, Log
 from RebuilddConfig import RebuilddConfig
 from RebuilddNetworkServer import RebuilddNetworkServer
 from Package import Package
@@ -313,6 +313,8 @@ class Rebuildd(object):
         job.status = JobStatus.WAIT
         job.arch = arch
         job.mailto = mailto
+
+        log = Log(job=job)
 
         RebuilddLog.info("Added job for %s_%s on %s/%s for %s" \
                       % (name, version, dist, arch, mailto))

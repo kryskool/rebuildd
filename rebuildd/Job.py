@@ -24,7 +24,7 @@ from email.Message import Message
 from Dists import Dists
 from JobStatus import JobStatus
 from JobStatus import FailedStatus
-from RebuilddLog import RebuilddLog
+from RebuilddLog import RebuilddLog, Log
 from RebuilddConfig import RebuilddConfig
 
 __version__ = "$Rev$"
@@ -43,6 +43,8 @@ class Job(threading.Thread, sqlobject.SQLObject):
     build_end = sqlobject.DateTimeCol(default=None)
     host = sqlobject.StringCol(default=None)
     deps = sqlobject.RelatedJoin('Job', joinColumn='joba', otherColumn='jobb')
+    log = sqlobject.SingleJoin('Log')
+
     notify = None
 
     def __init__(self, *args, **kwargs):
@@ -184,6 +186,16 @@ class Job(threading.Thread, sqlobject.SQLObject):
     def send_build_log(self):
         """When job is built, send logs by mail"""
 
+        try:
+            with open(self.logfile, "r") as build_log:
+                log =  build_log.read()
+        except IOError, error:
+            RebuilddLog.error("Unable to open logfile for job %d" % self.id)
+            return False
+
+        # Store in database
+        self.log.text = log
+
         with self.status_lock:
             if self.status != JobStatus.BUILD_OK and \
                 not self.status in FailedStatus:
@@ -217,15 +229,6 @@ class Job(threading.Thread, sqlobject.SQLObject):
         msg['X-Rebuildd-Version'] = __version__
         msg['X-Rebuildd-Host'] = socket.getfqdn()
 
-      
-        try:
-            with open(self.logfile, "r") as build_log:
-                log = ""
-                for line in build_log.readlines():
-                    log += line
-        except IOError, error:
-            RebuilddLog.error("Unable to open logfile for job %d" % self.id)
-            return False
 
         msg.set_payload(log)
 

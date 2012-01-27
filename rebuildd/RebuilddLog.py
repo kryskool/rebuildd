@@ -17,7 +17,14 @@
 #
 
 import logging
+import sqlobject
 from RebuilddConfig import RebuilddConfig
+
+class Log(sqlobject.SQLObject):
+    """Class implementing a Log"""
+
+    job = sqlobject.ForeignKey('Job', cascade=True)
+    text = sqlobject.BLOBCol(default="No build log available")
 
 class RebuilddLog(object):
     """Singleton used for logging"""

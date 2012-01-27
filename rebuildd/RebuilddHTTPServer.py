@@ -84,7 +84,7 @@ class RequestJob:
             with open(job.logfile, "r") as build_logfile:
                 build_log = build_logfile.read()
         except IOError, error:
-            build_log = "No build log available"
+            build_log = job.log.text
 
         return render.base(page=render.job(job=job, build_log=build_log), \
                 hostname=socket.gethostname(), \

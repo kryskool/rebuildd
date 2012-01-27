@@ -29,8 +29,10 @@ def create_db():
             sqlobject.connectionForURI(RebuilddConfig().get('build', 'database_uri'))
         from rebuildd.Package import Package
         from rebuildd.Job import Job
+        from rebuildd.RebuilddLog import Log
         Package.createTable()
         Job.createTable()
+        Log.createTable()
     except Exception, error:
         print "E: %s" % error
         return 1
