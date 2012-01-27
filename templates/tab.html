@@ -31,12 +31,18 @@ $for job in jobs:
         <td bgcolor="yellow" align="center">WAIT_LOCKED</td>
     $if job.status == 200:
         <td bgcolor="orange" align="center">BUILDING</td>
+    $if job.status == 250:
+        <td bgcolor="red" align="center">SOURCE_FAILED</td>
     $if job.status == 300:
+        <td bgcolor="red" align="center">BUILD_FAILED</td>
+    $if job.status == 350:
         <td bgcolor="red" align="center">BUILD_FAILED</td>
     $if job.status == 400:
         <td bgcolor="green" align="center">BUILD_OK</td>
     $if job.status == 800:
         <td bgcolor="red" align="center">CANCELED</td>
+    $if job.status == 850:
+        <td bgcolor="maroon" align="center">GIVEUP</td>
     $if job.status == 900:
         <td bgcolor="red" align="center">FAILED</td>
     $if job.status == 1000:
