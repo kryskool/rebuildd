@@ -3,7 +3,7 @@ Section: devel
 Priority: extra
 Maintainer: Julien Danjou <acid@debian.org>
 Build-Depends: cdbs, debhelper (>= 5), python (>= 2.5), python-support, xsltproc, docbook-xsl, python-sqlobject, python-apt (>= 0.7.91~)
-Standards-Version: 3.8.4
+Standards-Version: 3.9.2
 Homepage: http://julien.danjou.info/software/rebuildd
 Vcs-Git: git://anonscm.debian.org/rebuildd/rebuildd.git
 Vcs-Browser: http://anonscm.debian.org/git/rebuildd/rebuildd.git

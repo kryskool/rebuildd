@@ -3,6 +3,7 @@ rebuildd (0.4) unstable; urgency=low
   [ Julien Danjou ]
   * Bump version to indicate schema change and add a note in NEWS.Debian
     (Closes: #632525)
+  * Bump standard version
 
   [ Daniel Dehennin ]
   * Fix homepage URL
@@ -10,7 +11,7 @@ rebuildd (0.4) unstable; urgency=low
   * Store log in database (Closes: #657635)
   * Add missing status in the Web interface (Closes: #657636)
 
- -- Julien Danjou <acid@debian.org>  Fri, 27 Jan 2012 17:28:56 +0100
+ -- Julien Danjou <acid@debian.org>  Fri, 27 Jan 2012 17:47:37 +0100
 
 rebuildd (0.3.11) unstable; urgency=low
 
