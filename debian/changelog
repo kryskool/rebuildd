@@ -1,4 +1,4 @@
-rebuildd (0.4-1) unstable; urgency=low
+rebuildd (0.4) unstable; urgency=low
 
   [ Julien Danjou ]
   * Bump version to indicate schema change and add a note in NEWS.Debian
