@@ -1,7 +1,6 @@
 #!/usr/bin/make -f
-DEB_PYTHON_SYSTEM=pysupport
-DEB_DH_INSTALLINIT_ARGS=--no-restart-on-upgrade
 
+# export DH_VERBOSE=1
 
 ifneq (,$(findstring UNRELEASED,$(shell head -n 1 debian/changelog)))
 	VERSION="$(shell git describe 2>/dev/null || echo devel)"
@@ -9,25 +8,27 @@ else
 	VERSION=$(shell head -n1 debian/changelog | cut -d\( -f2 | cut -d\) -f1)
 endif
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/python-distutils.mk
+%:
+	dh --with python2 $@
 
-build/rebuildd:: build-stamp-rebuildd
-build-stamp-rebuildd:
-	@echo Running test suite
+override_dh_clean:
+	dh_clean rebuildd.1 rebuildd-job.1 debian/rebuilddrc
+
+override_dh_auto_test:
 	./tests/runtest.py
+
+override_dh_auto_build:
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd.manpage.xml
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl debian/rebuildd-job.manpage.xml
 	printf 'from rebuildd.RebuilddConfig import RebuilddConfig\nprint RebuilddConfig(True).dump()\n' | python > debian/rebuilddrc
-	touch build-stamp-rebuildd
 
-install/rebuildd::
-	install -d debian/rebuildd/usr/sbin
-	install -m 0755 rebuildd.py debian/rebuildd/usr/sbin/rebuildd
-	sed -i "s,^__version__.*$=,__version__ = \"$(VERSION)\"," debian/rebuildd/usr/lib/python*/site-packages/rebuildd/*.py
-	dh_installinit --name=rebuildd-httpd $(DEB_DH_INSTALLINIT_ARGS)
+override_dh_installinit:
+	dh_installinit --no-restart-on-upgrade
+	dh_installinit --name=rebuildd-httpd --no-restart-on-upgrade
 
-cleanbuilddir/rebuildd::
-	rm -f rebuildd.1 rebuildd-job.1
-	rm -f debian/rebuilddrc
-	rm -f build-stamp-rebuildd
+override_dh_install:
+	dh_install
+	mv debian/rebuildd/usr/sbin/rebuildd.py debian/rebuildd/usr/sbin/rebuildd
+	sed -i "s,^__version__.*$=,__version__ = \"$(VERSION)\"," debian/rebuildd/usr/lib/python*/dist-packages/rebuildd/*.py
+
+.PHONY: override_dh_auto_clean override_dh_auto_test override_dh_auto_build override_dh_installinit override_dh_install
