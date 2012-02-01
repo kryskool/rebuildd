@@ -51,8 +51,8 @@ class Rebuildd(object):
         # Init log system
         RebuilddLog()
 
-        sqlobject.sqlhub.processConnection = \
-            sqlobject.connectionForURI(self.cfg.get('build', 'database_uri')) 
+        self._sqlconnection = sqlobject.connectionForURI(self.cfg.get('build', 'database_uri'))
+        sqlobject.sqlhub.processConnection = self._sqlconnection
 
         # Create distributions
         for dist in self.cfg.get('build', 'dists').split(' '):

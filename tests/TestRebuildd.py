@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, "..")  
 sys.path.insert(0, ".")  
 
-from RebuilddTestSetup import rebuildd_global_test_setup
+from RebuilddTestSetup import rebuildd_global_test_setup, rebuildd_global_test_teardown
 import unittest, types, os, socket
 from rebuildd.RebuilddConfig import RebuilddConfig
 from rebuildd.Rebuildd import Rebuildd
@@ -18,6 +18,9 @@ class TestRebuildd(unittest.TestCase):
         rebuildd_global_test_setup()
         self.package = Package(name="zsh", version="4.3.4-10")
         self.r = Rebuildd()
+
+    def tearDown(self):
+        rebuildd_global_test_teardown()
 
     def test_add_job(self):
         ret = self.r.add_job(name="telak", version="0.5-1", priority='optional', dist="sid")
@@ -37,9 +40,14 @@ class TestRebuildd(unittest.TestCase):
         ret = self.r.stop_all_jobs()
         self.assert_(ret is True)
 
-    def test_release_jobs(self):
-        ret = self.r.release_jobs()
-        self.assert_(ret is True)
+    # def test_release_jobs(self):
+    #     self.r.add_job(name="zsh", version="4.3.4-10", priority='optional', dist="sid")
+    #     pkg = Package.selectBy(name="zsh", version="4.3.4-10")[0]
+    #     c = Job.selectBy(package=pkg)[0]
+    #     c.status = JobStatus.WAIT_LOCKED
+    #     c.host = socket.gethostname()
+    #     ret = self.r.release_jobs()
+    #     self.assert_(ret is True)
 
     def test_get_job(self):
         self.r.add_job(name="glibc", version="2.6-3", priority='required', dist="sid")
@@ -49,7 +57,7 @@ class TestRebuildd(unittest.TestCase):
         self.assert_(self.r.get_job(job.id) is job)
 
     def test_get_new_jobs(self):
-        self.r.add_job(name="xpdf", version="3.02-1", priority='optional', dist="lenny")
+        self.r.add_job(name="xpdf", version="3.02-1", priority='optional', dist="sid")
         self.assert_(self.r.get_new_jobs() >= 1)
 
     def test_cancel_job(self):
@@ -73,7 +81,7 @@ class TestRebuildd(unittest.TestCase):
         b.status = JobStatus.BUILDING
         b.host = "whoisgonnacallaboxlikethis"
 
-        self.r.add_job(name="iceweasel", version="5.0-2", priority='optional', dist="etch")
+        self.r.add_job(name="iceweasel", version="5.0-2", priority='optional', dist="sid")
         pkg = Package.selectBy(name="iceweasel", version="5.0-2")[0]
         c = Job.selectBy(package=pkg)[0]
         c.status = JobStatus.WAIT_LOCKED
@@ -87,14 +95,6 @@ class TestRebuildd(unittest.TestCase):
         self.assert_(b.host is "whoisgonnacallaboxlikethis")
         self.assert_(c.status is JobStatus.WAIT)
         self.assert_(c.host is None)
-
-        # Reset to a safe state or get_new_jobs will fail after
-        a.status = JobStatus.WAIT_LOCKED
-        a.host = socket.gethostname()
-        b.status = JobStatus.WAIT_LOCKED
-        b.host = socket.gethostname()
-        c.status = JobStatus.WAIT_LOCKED
-        c.host = socket.gethostname()
 
     def test_build_more_recent(self):
         self.r.get_new_jobs()

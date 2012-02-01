@@ -3,7 +3,7 @@ import sys
   
 sys.path.insert(0, "..")  
 sys.path.insert(0, ".")  
-from RebuilddTestSetup import rebuildd_global_test_setup
+from RebuilddTestSetup import rebuildd_global_test_setup, rebuildd_global_test_teardown
 import unittest, types, os
 import sqlobject
 from rebuildd.RebuilddConfig import RebuilddConfig
@@ -17,7 +17,14 @@ class TestJob(unittest.TestCase):
         rebuildd_global_test_setup()
         self.job = Job(package=Package(name="bash", version="3.1dfsg-8"), arch="alpha", dist="sid")
 
-    def test_init(self):
+    def tearDown(self):
+        rebuildd_global_test_teardown()
+
+    def test_DB_OK(self):
+        self.assert_(os.path.isfile('/tmp/rebuildd-tests.db'))
+        self.assert_(os.path.getsize('/tmp/rebuildd-tests.db') > 0)
+
+    def test_init_job(self):
         self.assert_(type(self.job) is Job)
 
     def test_setattr(self):
@@ -77,6 +84,10 @@ class TestJob(unittest.TestCase):
         self.assert_(self.job.status == JobStatus.POST_BUILD_FAILED)
 
     def test_send_build_log(self):
+        file = open(self.job.logfile, "w")
+        self.assert_(file is not None)
+        file.write("Fake log file")
+        file.close()
         self.assert_(self.job.send_build_log() is False)
         self.job.status = JobStatus.BUILD_OK
         self.assert_(self.job.send_build_log() is True)

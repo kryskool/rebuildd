@@ -52,6 +52,9 @@ class Job(threading.Thread, sqlobject.SQLObject):
 
         threading.Thread.__init__(self)
         sqlobject.SQLObject.__init__(self, *args, **kwargs)
+        if self.log is None:
+            log = Log(job=self)
+
         self.do_quit = threading.Event()
         self.status_lock = threading.Lock()
 
