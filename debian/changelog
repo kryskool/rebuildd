@@ -1,3 +1,51 @@
+rebuildd (0.4.1) unstable; urgency=low
+
+  * [10b50e1] Fix unit tests: Clean database drop and disable
+    TestRebuildd.test_release_jobs().
+    * rebuildd/Rebuildd.py (Rebuildd.init): Add sqlobject connection as
+      "hidden" attribute to clear and drop the database in tests.
+    * rebuildd/Job.py (Job.__init__): Auto vivification of the log, required
+      when the job is added throught Rebuildd().add_job().
+    * tests/RebuilddTestSetup.py: Import Log class to create the
+      corresponding table.
+      (rebuildd_global_test_setup): Drop tables before creating them if they
+      exist.
+      (rebuildd_global_test_teardown): Clear the database as much as possible.
+    * tests/TestDistribution.py: Import new teardown helper.
+     (TestDistribution.tearDown): Use the new teardown helper.
+    * tests/TestJob.py: Import new teardown helper.
+     (TestJob.tearDown): Use the new teardown helper.
+     (TestJob.test_DB_OK): Test if the database is created.
+     (TestJob.test_send_build_log): Create a fake log file or send_build_log
+     will raise an OSError.
+    * tests/TestRebuildd.py: Import new teardown helper.
+     (TestRebuildd.tearDown): Use the new teardown helper.
+     (TestRebuildd.test_release_jobs): Disable because is does not work with
+      database cleanup.
+     (TestRebuildd.test_get_new_jobs): Fix distribution to create the job
+      with the default configuration.
+     (TestRebuildd.test_fix_job): Ditoo.
+     (TestRebuildd): Remove useless cleanup since database is dropped on
+      tearDown. (Closes: #657887)
+  * [037e391] Switch from CDBS to debhelper and from python-support to
+    dh_python2.
+    * debian/control (Build-Depends): Remove cdbs.
+      Replace python (>= 2.5) by python-all-dev (>= 2.6.6-3) for dh_python2.
+      Remove deprecated python-support.
+    * debian/rebuildd.install: Install rebuildd.py binary
+    * debian/rules: Remove CDBS directives.
+      (override_dh_clean): Remove debian/rules generated files.
+      (override_dh_auto_test): Run test suite.
+      (override_dh_auto_build): Generate man pages and default configuration
+      file.
+      (override_dh_installinit): Need two calls to dh_install init for both
+      services.
+      (override_dh_install): Remove rebuildd.py extension.  Replace version
+      in python libraries.
+    * debian/pyversion: Useless with dh_python2.
+
+ -- Daniel Dehennin <daniel.dehennin@baby-gnu.org>  Mon, 06 Feb 2012 20:50:54 +0100
+
 rebuildd (0.4) unstable; urgency=low
 
   [ Julien Danjou ]
