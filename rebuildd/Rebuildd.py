@@ -293,6 +293,8 @@ class Rebuildd(object):
             arch = self.cfg.arch[0]
 
         if not Dists().get_dist(dist, arch):
+            RebuilddLog.error("Couldn't find dist/arch in the config file for %s_%s on %s/%s, don't adding it" \
+                           % (name, version, dist, arch))
             return False
 
         pkgs = Package.selectBy(name=name, version=version)

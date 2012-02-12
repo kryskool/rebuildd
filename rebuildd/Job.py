@@ -123,6 +123,10 @@ class Job(threading.Thread, sqlobject.SQLObject):
                                                      stdin=None,
                                                      stderr=subprocess.STDOUT)
             except Exception, error:
+                build_log.write("\nUnable to execute command \"%s\": %s" %\
+                        (cmd, error))
+                with self.status_lock:
+                    self.status = failed_status
                 state = 1
                 break
             state = proc.poll()
