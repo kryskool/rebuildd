@@ -1,5 +1,6 @@
 rebuildd (0.4.1) unstable; urgency=low
 
+  [ Daniel Dehennin ]
   * [10b50e1] Fix unit tests: Clean database drop and disable
     TestRebuildd.test_release_jobs().
     * rebuildd/Rebuildd.py (Rebuildd.init): Add sqlobject connection as
@@ -44,7 +45,11 @@ rebuildd (0.4.1) unstable; urgency=low
       in python libraries.
     * debian/pyversion: Useless with dh_python2.
 
- -- Daniel Dehennin <daniel.dehennin@baby-gnu.org>  Mon, 06 Feb 2012 20:50:54 +0100
+  [ Julien Danjou ]
+  * Fix silents error in rebuildd-job and jobs sticking in BUILDING state
+    on error (Closes: #570425)
+
+ -- Julien Danjou <acid@debian.org>  Mon, 13 Feb 2012 12:12:18 +0100
 
 rebuildd (0.4) unstable; urgency=low
 
