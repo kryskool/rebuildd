@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7.0.50~), python, xsltproc, docbook-xsl, python-sql
 Standards-Version: 3.9.2
 Homepage: http://julien.danjou.info/software/rebuildd
 Vcs-Git: git://anonscm.debian.org/rebuildd/rebuildd.git
-Vcs-Browser: http://anonscm.debian.org/git/rebuildd/rebuildd.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=rebuildd/rebuildd.git
 
 Package: rebuildd
 Architecture: all
