@@ -2,7 +2,7 @@ Source: rebuildd
 Section: devel
 Priority: extra
 Maintainer: Julien Danjou <acid@debian.org>
-Build-Depends: debhelper (>= 7.0.50~), python-all-dev (>= 2.6.6-3), xsltproc, docbook-xsl, python-sqlobject, python-apt (>= 0.7.91~)
+Build-Depends: debhelper (>= 7.0.50~), python, xsltproc, docbook-xsl, python-sqlobject, python-apt (>= 0.7.91~)
 Standards-Version: 3.9.2
 Homepage: http://julien.danjou.info/software/rebuildd
 Vcs-Git: git://anonscm.debian.org/rebuildd/rebuildd.git
