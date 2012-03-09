@@ -6,7 +6,7 @@ rebuildd (0.4.1) unstable; urgency=low
     * rebuildd/Rebuildd.py (Rebuildd.init): Add sqlobject connection as
       "hidden" attribute to clear and drop the database in tests.
     * rebuildd/Job.py (Job.__init__): Auto vivification of the log, required
-      when the job is added throught Rebuildd().add_job().
+      when the job is added through Rebuildd().add_job().
     * tests/RebuilddTestSetup.py: Import Log class to create the
       corresponding table.
       (rebuildd_global_test_setup): Drop tables before creating them if they
