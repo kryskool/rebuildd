@@ -49,8 +49,9 @@ rebuildd (0.4.1) unstable; urgency=low
   * Fix silents error in rebuildd-job and jobs sticking in BUILDING state
     on error (Closes: #570425)
   * Fix Vcs-Browser
+  * Bump standard version
 
- -- Julien Danjou <acid@debian.org>  Fri, 09 Mar 2012 11:45:29 +0100
+ -- Julien Danjou <acid@debian.org>  Fri, 09 Mar 2012 11:46:21 +0100
 
 rebuildd (0.4) unstable; urgency=low
 
